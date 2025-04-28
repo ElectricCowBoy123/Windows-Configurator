@@ -204,4 +204,24 @@ function Test-Admin(){
     Write-Host "Script is running with Administrator privileges." -ForegroundColor Green
 }
 
-#Export-ModuleMember -Function Test-URLs, Install-Python, Test-Python3, Set-ExecutionPolicy, Test-Windows11, Test-Admin
+function Test-Winget() {
+    Write-Host "Verifying if winget is installed..." -ForegroundColor Cyan
+    $wingetInstalled = Get-Command 'winget' -ErrorAction SilentlyContinue
+    if ($null -eq $wingetInstalled) {
+        Write-Host "winget not found. Installing winget..." -ForegroundColor Yellow
+        $installerUrl = "https://aka.ms/getwinget"
+        $installerPath = "$env:TEMP\Microsoft.DesktopAppInstaller_*.msixbundle"
+        Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+        Start-Process "msiexec.exe" -ArgumentList "/i `"$installerPath`" /quiet /norestart" -Wait
+
+        $wingetInstalled = Get-Command 'winget' -ErrorAction SilentlyContinue
+        if ($null -ne $wingetInstalled) {
+            Write-Host "winget Installed Successfully" -ForegroundColor Green
+        } else {
+            Write-Host "Failed to install winget!" -ForegroundColor Red
+        }
+    }
+    else {
+        Write-Host "winget is already installed." -ForegroundColor Green
+    }
+}

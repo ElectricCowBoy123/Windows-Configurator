@@ -43,12 +43,14 @@ function Import-Modules {
 
 # Overhead
 Import-Modules -modules $modules
-Test-Admin
 Test-Windows11
+Test-Admin
 Set-ExecutionPolicies
 Test-URLs($urlsToCheck)
+Test-Winget
 
 # Install Software
+Install-PowerShellLatest
 Install-WingetSoftware -softwareList $wingetSoftware
 Install-PIPSoftware -pipPackages $pipPackages
 Install-ChromeDriver
@@ -71,7 +73,7 @@ Initialize-NotepadPlusPlus -ThemeFilePath $themeFilePath -ConfigFilePath $Config
 # Configure Windows
 Initialize-Explorer -registrySettings $registrySettings
 Initialize-DesktopBackground -wallpaperPath $wallpaperPath
-Initialize-Waterfox -sourcePath $waterFoxConfigPath
+#Initialize-Waterfox -sourcePath $waterFoxConfigPath
 
 # download VS code add custom theme
 

@@ -9,7 +9,7 @@
     Description = 'This module contains functions to install and configure various software applications.'
 
     # Functions to export
-    FunctionsToExport = @('Initilize-OhMyPosh', 'Initialize-NotepadPlusPlus', 'Initialize-PowerShell', 'Initialize-Terminal', 'Install-ScheduledTasks')
+    FunctionsToExport = @('Initilize-OhMyPosh', 'Initialize-NotepadPlusPlus', 'Initialize-PowerShell', 'Initialize-Terminal', 'Install-ScheduledTasks', 'Install-PowerShellLatest')
 
     # Cmdlets to export
     CmdletsToExport = @()

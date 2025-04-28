@@ -88,7 +88,13 @@ function Initialize-Explorer() {
                     Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue -Type DWord -Force
                     Write-Host "Successfully set '$propertyName' to '$propertyValue' for '$friendlyName'." -ForegroundColor Yellow
                 } else {
-                    Write-Host "'$friendlyName' is already set to '$($propertyValue -eq 0 ? 'False' : $propertyValue -eq 1 ? 'True' : $propertyValue)' Skipping..." -ForegroundColor Green
+                    if($propertyValue -eq 0){
+                        Write-Host "'$friendlyName' is already set to 'False' Skipping..." -ForegroundColor Green
+                    } elseif($propertyValue -eq 1){
+                        Write-Host "'$friendlyName' is already set to 'True' Skipping..." -ForegroundColor Green
+                    } else {
+                        Write-Host "'$friendlyName' is already set to '$($propertyValue)' Skipping..." -ForegroundColor Green
+                    }
                 }
             } else {
                 Write-Host "Registry path '$registryPath' does not exist. Skipping..." -ForegroundColor Red

@@ -3,7 +3,7 @@ function Install-WingetSoftware() {
         [Parameter(Mandatory = $true)]
         [array]$softwareList
     )
-    Write-Host "Installing Software..." -ForegroundColor Cyan
+    Write-Host "Attempting to Install Software..." -ForegroundColor Cyan
     # Loop through the software list and install if not already installed
     foreach ($software in $softwareList) {
         if (-not (winget list | Select-String $software.Id)) {
@@ -11,6 +11,27 @@ function Install-WingetSoftware() {
             Invoke-Expression "winget install --id $($software.Id) --source winget --disable-interactivity --verbose"
         } else {
             Write-Host "$($software.Name) is already installed, skipping..." -ForegroundColor Green
+        }
+    }
+}
+
+function Install-PowerShellLatest {
+    [Version]$latestVersionInfo = winget show Microsoft.Powershell | Select-String -Pattern 'Version\s*:\s*(.+)' | ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
+    [Version]$installedPowerShell = (winget list --id Microsoft.Powershell | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)').Matches.Groups[1].Value
+
+    Write-Host "Checking if Latest PowerShell Version ($($latestVersionInfo)) is Installed..." -ForegroundColor Cyan
+
+    # Check if PowerShell 7 is already installed
+    if ($installedPowerShell -eq $latestVersionInfo) {
+        Write-Host "Powershell is Up-to-Date." -ForegroundColor Green
+        return
+    }
+    else {
+        try {
+            Invoke-Expression 'winget install --id Microsoft.Powershell --source winget --disable-interactivity --verbose'
+            Write-Host "Powershell Updated." -ForegroundColor Yellow
+        } catch {
+            Write-Host "Failed to install PowerShell using winget." -ForegroundColor Red
         }
     }
 }

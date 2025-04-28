@@ -67,7 +67,8 @@ $urlsToCheck = @(
     "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip",
     "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/catppuccin.omp.json",
     "https://github.com/Lexikos/AutoHotkey_L/releases/download/v1.1.37.02/AutoHotkey_1.1.37.02_setup.exe",
-    "https://github.com/Genymobile/scrcpy/releases/download/v3.2/scrcpy-win64-v3.2.zip"
+    "https://github.com/Genymobile/scrcpy/releases/download/v3.2/scrcpy-win64-v3.2.zip",
+    "https://aka.ms/getwinget"
 )
 
 $modules = @(

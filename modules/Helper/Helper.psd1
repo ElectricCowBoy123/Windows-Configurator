@@ -9,7 +9,7 @@
     Description = 'This module provides functionality for managing URLs and Python installations.'
 
     # Functions to export
-    FunctionsToExport = @('Install-Python', 'Test-URLs', 'Test-Python3', 'Set-ExecutionPolicy', 'Test-Windows11', 'Test-Admin')
+    FunctionsToExport = @('Install-Python', 'Test-URLs', 'Test-Python3', 'Set-ExecutionPolicy', 'Test-Windows11', 'Test-Admin', 'Test-Winget')
 
     # Cmdlets to export
     CmdletsToExport = @()
