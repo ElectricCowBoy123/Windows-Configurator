@@ -17,6 +17,7 @@ function Initialize-OhMyPosh(){
 
     # Add Oh My Posh initialization to the profile if not already present
     $profileContent = Get-Content $PROFILE -ErrorAction SilentlyContinue
+    # TODO make this paramterized, also make it so if the config is already there and the theme url gets changed then add it again, also consider downloading first offline might not work
     if (-not ($profileContent -match "oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/cobalt2.omp.json' | Invoke-Expression")) {
         Write-Host "Adding Oh My Posh initialization to PowerShell profile..." -ForegroundColor Yellow
         Add-Content -Path $PROFILE -Value "oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/cobalt2.omp.json' | Invoke-Expression"
