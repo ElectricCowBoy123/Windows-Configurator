@@ -25,7 +25,7 @@ function Initialize-OhMyPosh(){
     }
 }
 
-function Initialize-NotepadPlusPlus() {
+function Initialize-NotepadPlusPlus(){
     param (
         [Parameter(Mandatory=$True)]
         [string]$ThemeFilePath,
@@ -90,7 +90,7 @@ function Initialize-PowerShell(){
     }
 }
 
-function Initialize-Terminal() {
+function Initialize-Terminal(){
     Write-Host "Configuring Windows Terminal..." -ForegroundColor Cyan
     # Check and install MesloLGS font
     $mesloFontName = "MesloLGS"
@@ -165,7 +165,7 @@ function Initialize-Terminal() {
     }
 }
 
-function Install-ScheduledTasks() {
+function Install-ScheduledTasks(){
     param(
         [Parameter(Mandatory=$true)]
         [String]$ahkDirectory,
@@ -213,7 +213,7 @@ function Install-ScheduledTasks() {
     }
 }
 
-function Initialize-Waterfox {
+function Initialize-Waterfox(){
     param (
         [Parameter(Mandatory = $true)]
         [string]$sourcePath
@@ -259,6 +259,10 @@ function Initialize-Waterfox {
                             $overwriteNeeded = $True
                             break
                         }
+                    }
+                    catch {
+                        Write-Host "Error comparing files: $($sourceFile.FullName) and $($chromeFilePath). Skipping..." -ForegroundColor Red
+                        continue
                     }
                 }
             }

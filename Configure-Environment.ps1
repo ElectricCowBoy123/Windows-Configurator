@@ -6,20 +6,29 @@ try {
 }
 
 # Need to change this function so modules aren't reimported if they are already loaded, this is a testing function
-function Import-Modules(){
+function Import-Modules {
   param(
       [Parameter(Mandatory = $True)]
       [array]$modules
   )
+  
   Write-Host "Importing Modules..." -ForegroundColor Cyan
-  foreach($module in $modules){
+  
+  foreach ($module in $modules) {
       if (Get-Module -Name $module.Name) {
           Remove-Module -Name $module.Name -Force
       }
 
       try {
           Write-Host "Attempting to import module: $($module.Id)" -ForegroundColor Yellow
-          Import-Module "$($module.Id)" -Force
+          
+          # Check if the module file exists before attempting to import
+          if (Test-Path "$($module.Id)") {
+              Import-Module "$($module.Id)" -Force
+          } else {
+              Write-Host "Module file not found: $($module.Id)" -ForegroundColor Red
+              exit(1)
+          }
       } catch {
           Write-Host "Failed to Import $($module.Name). Error: $_" -ForegroundColor Red
           exit(1)
@@ -30,6 +39,7 @@ function Import-Modules(){
           exit(1)
       }
   }
+  
   Write-Host "Modules Imported Successfully." -ForegroundColor Green
 }
 

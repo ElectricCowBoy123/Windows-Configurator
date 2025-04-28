@@ -72,9 +72,9 @@ $urlsToCheck = @(
 
 $modules = @(
     @{ Name = "Helper"; Id = "$PSScriptRoot\modules\Helper\Helper.psm1" },
-    @{ Name = "Initialize-Software"; Id = "$PSScriptRoot\modules\Initialize-Software\Initialize-Software.psm1" },
     @{ Name = "Install-Software"; Id = "$PSScriptRoot\modules\Install-Software\Install-Software.psm1" },
-    @{ Name = "Configure-Windows"; Id = "$PSScriptRoot\modules\Configure-Windows\Configure-Windows.psm1" }
+    @{ Name = "Configure-Windows"; Id = "$PSScriptRoot\modules\Configure-Windows\Configure-Windows.psm1" },
+    @{ Name = "Initialize-Software"; Id = "$PSScriptRoot\modules\Initialize-Software\Initialize-Software.psm1" }
 )
 
 $wingetSoftware = @(
