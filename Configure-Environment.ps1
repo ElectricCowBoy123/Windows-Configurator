@@ -50,6 +50,11 @@ Test-URLs($urlsToCheck)
 Test-Winget
 
 # Install Software
+$input = Read-Host "[DEBUG] Do you want to update software? (Y/N)"
+if($input.ToUpper() -eq 'Y'){
+    Update-Software
+}
+
 Install-PowerShellLatest
 Install-WingetSoftware -softwareList $wingetSoftware
 Install-PIPSoftware -pipPackages $pipPackages
@@ -73,7 +78,8 @@ Initialize-NotepadPlusPlus -ThemeFilePath $themeFilePath -ConfigFilePath $Config
 # Configure Windows
 Initialize-Explorer -registrySettings $registrySettings
 Initialize-DesktopBackground -wallpaperPath $wallpaperPath
-#Initialize-Waterfox -sourcePath $waterFoxConfigPath
+Initialize-Waterfox -sourcePath $waterFoxConfigPath
+Initialize-WaterfoxPrefs -Preferences $waterFoxPrefrences
 
 # download VS code add custom theme
 

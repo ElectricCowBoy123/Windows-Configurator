@@ -137,3 +137,7 @@ $registrySettings = @(
 )
 
 $waterFoxConfigPath = "$($PSScriptRoot)\config\Waterfox"
+
+$waterFoxPrefrences = @{
+    "browser.theme.enableWaterfoxCustomizations" = 0
+}

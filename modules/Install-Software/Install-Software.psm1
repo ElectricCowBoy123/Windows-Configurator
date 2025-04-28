@@ -233,3 +233,8 @@ function Install-Scrcpy(){
         Write-Host "scrcpy is already in User PATH, skipping..." -ForegroundColor Green
     }
 }
+
+function Update-Software(){
+    Write-Host "Attempting to Update all Software Packages..." -ForegroundColor Cyan
+    Invoke-Expression "winget update --all --verbose"
+}

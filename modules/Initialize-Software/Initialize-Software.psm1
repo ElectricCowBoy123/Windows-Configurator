@@ -233,7 +233,7 @@ function Initialize-Waterfox(){
         [string]$sourcePath
     )
     
-    Write-Host "Configuring Waterfox..." -ForegroundColor Cyan
+    Write-Host "Configuring Waterfox Theme..." -ForegroundColor Cyan
 
     # Check if the source path exists
     if (-Not (Test-Path $sourcePath)) {
@@ -288,7 +288,7 @@ function Initialize-Waterfox(){
                 }
 
                 # Copy the contents from the source path to the chrome folder, overwriting existing files
-                Copy-Item -Path "$sourcePath\chrome" -Destination $chromeFolderPath -Recurse -Force
+                Copy-Item -Path "$sourcePath\chrome\*" -Destination $chromeFolderPath -Recurse -Force
                 Write-Host "Transferred contents from '$sourcePath' to '$chromeFolderPath'." -ForegroundColor Green
             } else {
                 Write-Host "'$(Split-Path -Path $browserProfile.FullName -Leaf)' already contains this configuration. Skipping..." -ForegroundColor Green
@@ -296,3 +296,80 @@ function Initialize-Waterfox(){
         }
     }
 }
+
+function Initialize-WaterfoxPrefs {
+    param (
+        [Parameter(Mandatory = $True)]
+        [hashtable]$Preferences
+    )
+
+    Write-Host "Configuring Waterfox User Configuration..." -ForegroundColor Cyan
+
+    $profileDirectories = Get-ChildItem -Path "$($env:APPDATA)\Waterfox\Profiles" -Directory
+    $prefsFilePath = $null
+
+    foreach ($profileDir in $profileDirectories) {
+        $prefsFilePathTest = Join-Path -Path $profileDir.FullName -ChildPath "prefs.js"
+        if (Test-Path $prefsFilePathTest) {
+            $prefsFilePath = $prefsFilePathTest
+            break  # Exit the loop once we find the prefs.js file
+        }
+    }
+
+    if (-not (Test-Path $prefsFilePath)) {
+        Write-Host "prefs.js file not found in the profile folder." -ForegroundColor Red
+        return
+    }
+
+    # Read the contents of prefs.js
+    $prefsContent = Get-Content -Path $prefsFilePath
+    $changesMade = $false
+
+    # Loop through each preference in the hashtable
+    foreach ($key in $Preferences.Keys) {
+        $value = $Preferences[$key]
+        $prefLine = "user_pref(`"$key`", $value);"
+        $existingLine = "user_pref(`"$key`","
+
+        # Initialize a flag to track if the preference exists
+        $preferenceFound = $false
+
+        # Check if the preference exists in the file
+        for ($i = 0; $i -lt $prefsContent.Count; $i++) {
+            if ($prefsContent[$i] -like "$existingLine*") {
+                [String]$currentLine = $prefsContent[$i]
+                [String]$currentValue = ($currentLine -split ',')[1].Trim() -replace '\);', ''
+                Write-Host "Value $($value) Currentvalue $($currentValue)"
+                # Check if the current value is the same as the desired value
+                if ($currentValue -eq $value) {
+                    Write-Host "Preference '$key' is already set to the desired value '$value'. Skipping..." -ForegroundColor Green
+                    $preferenceFound = $True
+                    break  # Skip to the next preference
+                }
+
+                # Replace the existing value
+                $prefsContent[$i] = $prefLine
+                Write-Host "Updated preference: $key to $value" -ForegroundColor Yellow
+                $changesMade = $true  # Mark that a change was made
+                $preferenceFound = $true
+                break  # Exit the loop since we found and updated the preference
+            }
+        }
+
+        # If the preference was not found, add it to the end of the file
+        if (-not $preferenceFound) {
+            $prefsContent += "`n$prefLine"
+            Write-Host "Added preference: $key with value $value" -ForegroundColor Yellow
+            $changesMade = $true  # Mark that a change was made
+        }
+    }
+
+    # Write the updated content back to prefs.js only if changes were made
+    if ($changesMade) {
+        Set-Content -Path $prefsFilePath -Value $prefsContent
+        Write-Host "prefs.js has been updated." -ForegroundColor Green
+    } else {
+        Write-Host "No changes were made to prefs.js." -ForegroundColor Cyan
+    }
+}
+
