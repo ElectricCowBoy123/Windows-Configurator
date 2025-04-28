@@ -20,8 +20,6 @@ function Import-Modules {
       }
 
       try {
-          Write-Host "Attempting to import module: $($module.Id)" -ForegroundColor Yellow
-          
           # Check if the module file exists before attempting to import
           if (Test-Path "$($module.Id)") {
               Import-Module "$($module.Id)" -Force

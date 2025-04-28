@@ -165,32 +165,45 @@ function Initialize-Terminal(){
     }
 }
 
-function Install-ScheduledTasks(){
+function Install-ScheduledTasks() {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]$ahkDirectory,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [String]$taskXml
     )
+    
     Write-Host "Installing Scheduled Tasks..." -ForegroundColor Cyan
-    # Ensure the directory exists
+    
+    # Ensure the source directory exists
     if (-not (Test-Path $ahkDirectory)) {
         Write-Host "The specified directory does not exist: $ahkDirectory" -ForegroundColor Red
         return
     }
 
+    # Ensure the destination directory exists
+    $destinationDirectory = "C:\AHK"
+    if (-not (Test-Path $destinationDirectory)) {
+        New-Item -Path $destinationDirectory -ItemType Directory -Force | Out-Null
+    }
+
     # Get all .ahk files in the specified directory
     $ahkFiles = Get-ChildItem -Path $ahkDirectory -Filter *.ahk -File
 
-    # Create a scheduled task for each AHK file
+    # Copy the .ahk files to the destination directory
+    foreach ($file in $ahkFiles) {
+        Copy-Item -Path $file.FullName -Destination $destinationDirectory -Force
+    }
+
+    # Create a scheduled task for each AHK file in the destination directory
     foreach ($file in $ahkFiles) {
         $taskName = "AHK $($file.BaseName)"
         $taskPath = "\Personal\$($taskName)"
         
         # Replace placeholders in the XML
         $currentTaskXml = $taskXml -replace 'TASKPATH', $taskPath
-        $currentTaskXml = $currentTaskXml -replace 'FILEPATH', $file.FullName
+        $currentTaskXml = $currentTaskXml -replace 'FILEPATH', "$destinationDirectory\$($file.Name)"
 
         # Check if the task already exists
         $taskExists = -not (schtasks.exe /Query /TN $taskPath 2>&1 | Select-String "ERROR:")
