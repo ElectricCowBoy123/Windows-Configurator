@@ -1,0 +1,214 @@
+function Install-WingetSoftware() {
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]$softwareList
+    )
+    Write-Host "Installing Software..." -ForegroundColor Cyan
+    # Loop through the software list and install if not already installed
+    foreach ($software in $softwareList) {
+        if (-not (winget list | Select-String $software.Id)) {
+            Write-Host "$($software.Name) is not installed. Installing $($software.Name)..." -ForegroundColor Yellow
+            Invoke-Expression "winget install --id $($software.Id) --source winget --disable-interactivity --verbose"
+        } else {
+            Write-Host "$($software.Name) is already installed, skipping..." -ForegroundColor Green
+        }
+    }
+}
+
+function Install-PIPSoftware() {
+    param (
+        [Parameter(Mandatory = $true)]
+        [array]$pipPackages
+    )
+    
+    Write-Host "Installing PIP packages..." -ForegroundColor Cyan
+    $pythonPath = (Get-Command python -ErrorAction SilentlyContinue).Source
+    
+    if ($pythonPath) {
+        foreach ($packageInfo in $pipPackages) {
+            $friendlyName = $packageInfo.Name
+            $package = $packageInfo.Module
+            
+            # Check if the package is installed
+            $packageInstalled = python -m pip show $package 2>&1
+            
+            if ($packageInstalled -like "*No module named*" -or $packageInstalled -like "*not found:*") {
+                Write-Host "$friendlyName ($package) is not installed. Installing..." -ForegroundColor Yellow
+                
+                # Upgrade pip first
+                Invoke-Expression "python -m pip install --upgrade pip"
+                
+                # Attempt to install the package
+                $installResult = Invoke-Expression "python -m pip install $package 2>&1"
+                
+                # Check if the installation was successful
+                if ($installResult -like "*Successfully installed*") {
+                    Write-Host "$friendlyName ($package) installed successfully." -ForegroundColor Green
+                } else {
+                    Write-Host "Failed to install $friendlyName ($package). Error: $installResult" -ForegroundColor Red
+                }
+            } else {
+                Write-Host "$friendlyName ($package) is already installed, skipping..." -ForegroundColor Green
+            }
+        }
+    } else {
+        Write-Host "Python is not installed. Can't install pip packages!" -ForegroundColor Red
+        exit(1)
+    }
+}
+
+function Install-pip() {
+    # Check and install pip
+    $pipInstalled = Invoke-Expression "python -m pip --version" 2>&1
+    if (-not $pipInstalled) {
+        Write-Host "pip is not installed. Installing pip..." -ForegroundColor Yellow
+        Invoke-Expression "python -m ensurepip --upgrade"
+    } else {
+        Write-Host "pip is already installed, skipping..." -ForegroundColor Green
+    }
+}
+
+function Install-ChromeDriver(){
+    Write-Host "Installing ChromeDriver..." -ForegroundColor Cyan
+    # Check and install ChromeDriver
+    $chromeDriverDir = "C:\ChromeDriver"
+
+    if (-not (Test-Path $chromeDriverDir)) {
+        Write-Host "ChromeDriver directory does not exist. Creating directory..." -ForegroundColor Yellow
+        New-Item -ItemType Directory -Path $chromeDriverDir -Force
+    }
+
+    $chromeDriverExe = Join-Path $chromeDriverDir "chromedriver.exe"
+    if (-not (Test-Path $chromeDriverExe)) {
+        Write-Host "ChromeDriver is not installed. Installing ChromeDriver..." -ForegroundColor Yellow
+        $chromeDriverUrl = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
+        $chromeDriverVersion = Invoke-RestMethod -Uri $chromeDriverUrl
+        $chromeDriverZip = "chromedriver_win32.zip"
+        $chromeDriverDownloadUrl = "https://chromedriver.storage.googleapis.com/$($chromeDriverVersion)/$($chromeDriverZip)"
+        Invoke-WebRequest -Uri $chromeDriverDownloadUrl -OutFile $chromeDriverZip
+        Expand-Archive -Path $chromeDriverZip -DestinationPath $chromeDriverDir -Force
+        Remove-Item -Path $chromeDriverZip
+    } else {
+        Write-Host "ChromeDriver is already installed, skipping..." -ForegroundColor Green
+    }
+
+    # Add ChromeDriver to PATH for Machine scope if not already added
+    if (-not ([Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) -split ";").Contains($chromeDriverDir)) {
+        Write-Host "Adding ChromeDriver to Machine PATH..." -ForegroundColor Yellow
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) + ";$chromeDriverDir", [EnvironmentVariableTarget]::Machine)
+    } else {
+        Write-Host "ChromeDriver is already in Machine PATH, skipping..." -ForegroundColor Green
+    }
+
+    # Add ChromeDriver to PATH for User scope if not already added
+    if (-not ([Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) -split ";").Contains($chromeDriverDir)) {
+        Write-Host "Adding ChromeDriver to User PATH..." -ForegroundColor Yellow
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$chromeDriverDir", [EnvironmentVariableTarget]::User)
+    } else {
+        Write-Host "ChromeDriver is already in User PATH, skipping..." -ForegroundColor Green
+    }
+}
+
+function Install-AHK(){
+    Write-Host "Installing AHK..." -ForegroundColor Cyan
+    # Check and install AutoHotkey
+    $ahkExpectedPath = "C:\Program Files\AutoHotkey\v1.1.37.02\AutoHotkeyU64.exe"
+    if (-not (Test-Path $ahkExpectedPath)) {
+        Write-Host "AutoHotkey is not installed or the expected version is not found. Installing AutoHotkey v1.1.37.02..." -ForegroundColor Yellow
+        $ahkInstallerUrl = "https://github.com/Lexikos/AutoHotkey_L/releases/download/v1.1.37.02/AutoHotkey_1.1.37.02_setup.exe"
+        $ahkInstallerPath = "$env:TEMP\AutoHotkey_1.1.37.02_setup.exe"
+        Invoke-WebRequest -Uri $ahkInstallerUrl -OutFile $ahkInstallerPath
+        Start-Process -FilePath $ahkInstallerPath -ArgumentList "/S" -Wait
+        Remove-Item -Path $ahkInstallerPath -Force
+    } else {
+        Write-Host "AutoHotkey v1.1.37.02 is already installed, skipping..." -ForegroundColor Green
+    }
+}
+
+function Install-Debian(){
+    Write-Host "Installing Debian..." -ForegroundColor Cyan
+    # Check if Debian is installed
+    $debian = Invoke-Expression "wsl --list" | ForEach-Object {
+        [PSCustomObject]@{
+            Distribution = $_
+        }
+    }
+
+    foreach ($item in $debian) {
+        if ($item.Distribution -eq "Debian") {
+            $debian = $True
+        }
+    }
+
+    if (-not $debian) {
+        Write-Host "Debian is not installed. Installing Debian..." -ForegroundColor Yellow
+        Invoke-Expression "wsl --install -d Debian"
+    } else {
+        Write-Host "Debian is already installed, skipping..." -ForegroundColor Green
+    }
+}
+
+function Install-WSL(){
+    Write-Host "Installing WSL..." -ForegroundColor Cyan
+    # Check and install WSL and Debian
+    if (-not (Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux).State -eq "Enabled") {
+        Write-Host "WSL is not installed. Installing WSL..." -ForegroundColor Yellow
+        Invoke-Expression "wsl --install"
+        Start-Sleep -Seconds 10
+    }
+}
+
+function Install-Scrcpy(){
+    Write-Host "Installing scrcpy..." -ForegroundColor Cyan
+    # Download and install scrcpy
+    $scrcpyUrl = "https://github.com/Genymobile/scrcpy/releases/download/v3.2/scrcpy-win64-v3.2.zip"
+    $scrcpyZip = "scrcpy.zip"
+    $scrcpyDir = "C:\AHK\scrcpy"
+
+    if (-not (Test-Path $scrcpyDir)) {
+        Write-Host "scrcpy directory does not exist. Creating directory..." -ForegroundColor Yellow
+        New-Item -ItemType Directory -Path $scrcpyDir -Force
+    }
+
+    if (-not (Test-Path (Join-Path $scrcpyDir "scrcpy.exe"))) {
+        Write-Host "Downloading scrcpy..." -ForegroundColor Yellow
+        Invoke-WebRequest -Uri $scrcpyUrl -OutFile $scrcpyZip
+        Expand-Archive -Path $scrcpyZip -DestinationPath $scrcpyDir -Force
+
+        # Find the extracted folder dynamically
+        $extractedFolder = Get-ChildItem -Path $scrcpyDir -Directory | Select-Object -First 1
+        if ($extractedFolder) {
+            Get-ChildItem -Path $extractedFolder.FullName -Recurse | Move-Item -Destination $scrcpyDir -Force
+            Remove-Item -Path $extractedFolder.FullName -Recurse -Force
+        }
+
+        Remove-Item -Path $scrcpyZip -Force
+        Write-Host "scrcpy installed successfully." -ForegroundColor Green
+    } else {
+        Write-Host "scrcpy is already installed, skipping..." -ForegroundColor Green
+    }
+
+    # Remove any existing scrcpy paths from Machine PATH
+    $machinePath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
+    $updatedMachinePath = ($machinePath -split ";" | Where-Object { $_ -notmatch "(?i)\b$([regex]::Escape($scrcpyDir))\b" }) -join ";"
+
+    # Add scrcpy to PATH for Machine scope if not already added
+    if (-not ($machinePath -split ";").Contains($scrcpyDir)) {
+        Write-Host "Adding scrcpy to Machine PATH..." -ForegroundColor Yellow
+        [Environment]::SetEnvironmentVariable("Path", "$updatedMachinePath;$scrcpyDir", [EnvironmentVariableTarget]::Machine)
+    } else {
+        Write-Host "scrcpy is already in Machine PATH, skipping..." -ForegroundColor Green
+    }
+
+    # Remove any existing scrcpy paths from User PATH
+    $userPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
+    $updatedUserPath = ($userPath -split ";" | Where-Object { $_ -notmatch "(?i)\b$([regex]::Escape($scrcpyDir))\b" }) -join ";"
+
+    # Add scrcpy to PATH for User scope if not already added
+    if (-not ($userPath -split ";").Contains($scrcpyDir)) {
+        Write-Host "Adding scrcpy to User PATH..." -ForegroundColor Yellow
+        [Environment]::SetEnvironmentVariable("Path", "$updatedUserPath;$scrcpyDir", [EnvironmentVariableTarget]::User)
+    } else {
+        Write-Host "scrcpy is already in User PATH, skipping..." -ForegroundColor Green
+    }
+}

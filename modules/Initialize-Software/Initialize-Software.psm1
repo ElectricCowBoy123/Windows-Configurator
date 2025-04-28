@@ -1,0 +1,280 @@
+function Initialize-OhMyPosh(){
+    Write-Host "Configuring Oh My Posh..." -ForegroundColor Cyan
+    # Add Oh My Posh to PATH if not already added
+    $ohMyPoshPath = "$env:LOCALAPPDATA\Programs\oh-my-posh\bin"
+    if (-not ([Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) -split ";").Contains($ohMyPoshPath)) {
+        Write-Host "Adding Oh My Posh to PATH..." -ForegroundColor Yellow
+        [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$ohMyPoshPath", [EnvironmentVariableTarget]::User)
+    } else {
+        Write-Host "Oh My Posh is already in PATH, skipping..." -ForegroundColor Green
+    }
+
+    # Ensure $PROFILE exists and add Oh My Posh initialization
+    if (-not (Test-Path $PROFILE)) {
+        Write-Host "PowerShell profile does not exist. Creating profile..." -ForegroundColor Yellow
+        New-Item -Path $PROFILE -Type File -Force
+    }
+
+    # Add Oh My Posh initialization to the profile if not already present
+    $profileContent = Get-Content $PROFILE -ErrorAction SilentlyContinue
+    if (-not ($profileContent -match "oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/catppuccin.omp.json' | Invoke-Expression")) {
+        Write-Host "Adding Oh My Posh initialization to PowerShell profile..." -ForegroundColor Yellow
+        Add-Content -Path $PROFILE -Value "oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/catppuccin.omp.json' | Invoke-Expression"
+    } else {
+        Write-Host "Oh My Posh initialization is already present in the PowerShell profile, skipping..." -ForegroundColor Green
+    }
+}
+
+function Initialize-NotepadPlusPlus() {
+    param (
+        [Parameter(Mandatory=$True)]
+        [string]$ThemeFilePath,
+
+        [Parameter(Mandatory=$True)]
+        [string]$ConfigFilePath
+    )
+    Write-Host "Configuring Notepad++..." -ForegroundColor Cyan
+    # Define the local Notepad++ configuration path
+    $LocalConfigPath = Join-Path $env:APPDATA "Notepad++"
+    $ThemePath = Join-Path $LocalConfigPath "themes"
+
+    # Ensure the themes directory exists
+    if (!(Test-Path $ThemePath)) {
+        New-Item -Path $ThemePath -ItemType Directory -Force | Out-Null
+    }
+
+    # Define the full paths for the theme and config files
+    $ThemeFullPath = Join-Path $ThemePath "VS2019-Dark.xml"
+    $LocalConfigFullPath = Join-Path $LocalConfigPath "config.xml"
+
+    # Check if the theme file already exists
+    if (Test-Path $ThemeFullPath) {
+        Write-Host "Notepad++ Theme already configured, skipping..." -ForegroundColor Green
+    } else {
+        # Read the content from the provided theme file path
+        if (Test-Path $ThemeFilePath) {
+            $ThemeContent = Get-Content -Path $ThemeFilePath -Raw
+            Set-Content -Path $ThemeFullPath -Value $ThemeContent -Force
+            Write-Host "Notepad++ Theme file successfully written to Notepad++ themes folder." -ForegroundColor Yellow
+        } else {
+            Write-Host "Theme file not found at path: $ThemeFilePath" -ForegroundColor Red
+            return
+        }
+    }
+
+    # Check if the config file already exists
+    if (Test-Path $LocalConfigFullPath) {
+        Write-Host "Notepad++ Configuration already configured, skipping..." -ForegroundColor Green
+    } else {
+        # Read the content from the provided config file path
+        if (Test-Path $ConfigFilePath) {
+            $ConfigContent = Get-Content -Path $ConfigFilePath -Raw
+            Set-Content -Path $LocalConfigFullPath -Value $ConfigContent -Force
+            Write-Host "Notepad++ Configuration file successfully written to Notepad++ config folder." -ForegroundColor Yellow
+        } else {
+            Write-Host "Config file not found at path: $ConfigFilePath" -ForegroundColor Red
+            return
+        }
+    }
+}
+
+function Initialize-PowerShell(){
+    Write-Host "Configuring Powershell..." -ForegroundColor Cyan
+    # Stop Powershell from checking for updates
+    if ([System.Environment]::GetEnvironmentVariable('POWERSHELL_UPDATECHECK', 'User') -ne '0') {
+        Write-Host "Disabling PowerShell update checks..." -ForegroundColor Yellow
+        $PSVersionTable.PSVersion.Major -eq 7 | Out-Null; if ($?) { [System.Environment]::SetEnvironmentVariable('POWERSHELL_UPDATECHECK', '0', 'User') }
+        Write-Host "PowerShell update checks have been disabled." -ForegroundColor Green
+    } else {
+        Write-Host "PowerShell update checks are already disabled, skipping..." -ForegroundColor Green
+    }
+}
+
+function Initialize-Terminal() {
+    Write-Host "Configuring Windows Terminal..." -ForegroundColor Cyan
+    # Check and install MesloLGS font
+    $mesloFontName = "MesloLGS"
+    $fontsFolder = "$env:SystemRoot\Fonts"
+
+    if (-not (Get-ChildItem -Path $fontsFolder -Filter "*.ttf" | Where-Object { $_.Name -like "*$mesloFontName*" })) {
+        Write-Host "MesloLGS NF font is not installed. Installing MesloLGS NF font..." -ForegroundColor Yellow
+        $mesloFontUrl = "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
+        $mesloFontZip = "Meslo.zip"
+        $mesloFontExtractPath = "MesloFonts"
+
+        Invoke-WebRequest -Uri $mesloFontUrl -OutFile $mesloFontZip
+        Expand-Archive -Path $mesloFontZip -DestinationPath $mesloFontExtractPath -Force
+        Copy-Item -Path "$mesloFontExtractPath\*.ttf" -Destination $fontsFolder -Force
+        Remove-Item -Path $mesloFontZip, $mesloFontExtractPath -Recurse -Force
+
+        Write-Host "MesloLGS NF font installed successfully." -ForegroundColor Green
+    } else {
+        Write-Host "MesloLGS NF font is already installed, skipping..." -ForegroundColor Green
+    }
+
+    # Set MesloLGS NF font as the default in Windows Terminal settings
+    $terminalSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+
+    if (Test-Path $terminalSettingsPath) {
+        $settingsJson = Get-Content -Path $terminalSettingsPath -Raw | ConvertFrom-Json
+
+        if ($settingsJson.profiles.defaults.font.PSObject.Properties.Match("face")) {
+            if ($settingsJson.profiles.defaults.font.face -ne "MesloLGS NF") {
+                Write-Host "Setting MesloLGS NF font as the default..." -ForegroundColor Yellow
+                $settingsJson.profiles.defaults.font.face = "MesloLGS NF"
+                $settingsJson | ConvertTo-Json -Depth 10 | Set-Content -Path $terminalSettingsPath -Force
+                Write-Host "MesloLGS NF font has been set as the default in Windows Terminal settings." -ForegroundColor Green
+            } else {
+                Write-Host "MesloLGS NF font is already set as the default, skipping..." -ForegroundColor Green
+            }
+        } else {
+            Write-Host "Adding font.face property to defaults and setting it to MesloLGS NF..." -ForegroundColor Yellow
+            if (-not $settingsJson.profiles.defaults.font) {
+                $settingsJson.profiles.defaults | Add-Member -MemberType NoteProperty -Name font -Value @{ face = "MesloLGS NF" }
+            } else {
+                $settingsJson.profiles.defaults.font | Add-Member -MemberType NoteProperty -Name face -Value "MesloLGS NF"
+            }
+            $settingsJson | ConvertTo-Json -Depth 10 | Set-Content -Path $terminalSettingsPath -Force
+            Write-Host "MesloLGS NF font has been set as the default in Windows Terminal settings." -ForegroundColor Green
+        }
+    } else {
+        Write-Host "Windows Terminal settings file not found. Please ensure Windows Terminal is installed." -ForegroundColor Red
+    }
+
+    # Configure Windows Terminal to use the Dark+ color scheme and enable transparency
+    if (Test-Path $terminalSettingsPath) {
+        $settingsJson = Get-Content -Path $terminalSettingsPath -Raw | ConvertFrom-Json
+
+        # Ensure profiles.defaults exists
+        if (-not $settingsJson.profiles.defaults) {
+            $settingsJson.profiles | Add-Member -MemberType NoteProperty -Name defaults -Value @{}
+        }
+
+        # Set the color scheme to Dark+
+        $settingsJson.profiles.defaults.colorScheme = "Dark+"
+
+        # Enable transparency at 90%
+        $settingsJson.profiles.defaults.useAcrylic = $true
+        $settingsJson.profiles.defaults.opacity = 90
+
+        # Save the updated settings
+        $settingsJson | ConvertTo-Json -Depth 10 | Set-Content -Path $terminalSettingsPath -Force
+        Write-Host "Windows Terminal already configured..." -ForegroundColor Green
+    } else {
+        Write-Host "Windows Terminal settings file not found. Please ensure Windows Terminal is installed." -ForegroundColor Red
+    }
+}
+
+function Install-ScheduledTasks() {
+    param(
+        [Parameter(Mandatory=$true)]
+        [String]$ahkDirectory,
+
+        [Parameter(Mandatory=$true)]
+        [String]$taskXml
+    )
+    Write-Host "Installing Scheduled Tasks..." -ForegroundColor Cyan
+    # Ensure the directory exists
+    if (-not (Test-Path $ahkDirectory)) {
+        Write-Host "The specified directory does not exist: $ahkDirectory" -ForegroundColor Red
+        return
+    }
+
+    # Get all .ahk files in the specified directory
+    $ahkFiles = Get-ChildItem -Path $ahkDirectory -Filter *.ahk -File
+
+    # Create a scheduled task for each AHK file
+    foreach ($file in $ahkFiles) {
+        $taskName = "AHK $($file.BaseName)"
+        $taskPath = "\Personal\$($taskName)"
+        
+        # Replace placeholders in the XML
+        $currentTaskXml = $taskXml -replace 'TASKPATH', $taskPath
+        $currentTaskXml = $currentTaskXml -replace 'FILEPATH', $file.FullName
+
+        # Check if the task already exists
+        $taskExists = -not (schtasks.exe /Query /TN $taskPath 2>&1 | Select-String "ERROR:")
+
+        if (-not $taskExists) {
+            # Save the XML to a temporary file
+            $tempXmlPath = [System.IO.Path]::GetTempFileName()
+            Set-Content -Path $tempXmlPath -Value $currentTaskXml -Encoding Unicode
+
+            # Register the scheduled task
+            schtasks.exe /Create /TN $taskPath /XML $tempXmlPath /F | Out-Null
+
+            # Remove the temporary XML file
+            Remove-Item -Path $tempXmlPath -Force
+
+            Write-Host "Scheduled task created for $($file.Name)." -ForegroundColor Yellow
+        } else {
+            Write-Host "Scheduled task for $($file.Name) already exists, skipping..." -ForegroundColor Green
+        }
+    }
+}
+
+function Initialize-Waterfox {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$sourcePath
+    )
+    
+    Write-Host "Configuring Waterfox..." -ForegroundColor Cyan
+
+    # Check if the source path exists
+    if (-Not (Test-Path $sourcePath)) {
+        Write-Host "Source path '$sourcePath' does not exist. Please provide a valid path." -ForegroundColor Red
+        return
+    }
+
+    # Get all profile directories
+    $profileDirectories = Get-ChildItem -Path "$($env:APPDATA)\Waterfox\Profiles" -Directory
+
+    foreach ($browserProfile in $profileDirectories) {
+        $chromeFolderPath = Join-Path -Path $browserProfile.FullName -ChildPath "chrome"
+        $addonsJsonPath = Join-Path -Path $browserProfile.FullName -ChildPath "addons.json"
+
+        # Check if the profile directory contains an addons.json file
+        if (Test-Path $addonsJsonPath) {
+            # Get the list of files in the source and chrome folders
+            $sourceFiles = Get-ChildItem -Path $sourcePath -Recurse -File
+            $overwriteNeeded = $False
+            
+            foreach ($sourceFile in $sourceFiles) {
+                $relativePath = $sourceFile.FullName.Substring($sourcePath.Length + 1)
+                $chromeFilePath = Join-Path -Path $chromeFolderPath -ChildPath $relativePath
+                Write-Host "FilePath: $($chromeFilePath)"
+                if (-Not (Test-Path $chromeFilePath)) {
+                    # If the file does not exist in chrome, we need to copy it
+                    $overwriteNeeded = $True
+                    break
+                } else {
+                    # If the file exists, compare the content
+                    try {
+                        $sourceFileHash = Get-FileHash -Path $sourceFile.FullName
+                        $chromeFileHash = Get-FileHash -Path $chromeFilePath
+
+                        if ($sourceFileHash.Hash -ne $chromeFileHash.Hash) {
+                            # If the hashes are different, we need to overwrite
+                            $overwriteNeeded = $True
+                            break
+                        }
+                    }
+                }
+            }
+
+            if ($overwriteNeeded) {
+                # Ensure the chrome folder exists before copying
+                if (-Not (Test-Path $chromeFolderPath)) {
+                    New-Item -ItemType Directory -Path $chromeFolderPath -Force | Out-Null
+                }
+
+                # Copy the contents from the source path to the chrome folder, overwriting existing files
+                Copy-Item -Path "$sourcePath\chrome" -Destination $chromeFolderPath -Recurse -Force
+                Write-Host "Transferred contents from '$sourcePath' to '$chromeFolderPath'." -ForegroundColor Green
+            } else {
+                Write-Host "'$(Split-Path -Path $browserProfile.FullName -Leaf)' already contains this configuration. Skipping..." -ForegroundColor Green
+            }
+        }
+    }
+}
