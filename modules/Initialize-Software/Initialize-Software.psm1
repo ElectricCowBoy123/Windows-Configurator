@@ -339,7 +339,7 @@ function Initialize-WaterfoxPrefs {
             if ($prefsContent[$i] -like "$existingLine*") {
                 [String]$currentLine = $prefsContent[$i]
                 [String]$currentValue = ($currentLine -split ',')[1].Trim() -replace '\);', ''
-                Write-Host "Value $($value) Currentvalue $($currentValue)"
+                #Write-Host "Value $($value) Currentvalue $($currentValue)"
                 # Check if the current value is the same as the desired value
                 if ($currentValue -eq $value) {
                     Write-Host "Preference '$key' is already set to the desired value '$value'. Skipping..." -ForegroundColor Green
@@ -367,9 +367,6 @@ function Initialize-WaterfoxPrefs {
     # Write the updated content back to prefs.js only if changes were made
     if ($changesMade) {
         Set-Content -Path $prefsFilePath -Value $prefsContent
-        Write-Host "prefs.js has been updated." -ForegroundColor Green
-    } else {
-        Write-Host "No changes were made to prefs.js." -ForegroundColor Cyan
     }
 }
 
