@@ -41,6 +41,11 @@ function Import-Modules {
   Write-Host "Modules Imported Successfully." -ForegroundColor Green
 }
 
+if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
+    & neofetch
+    Write-Host ""
+}
+
 # Overhead
 Import-Modules -modules $modules
 Test-Windows11
@@ -50,11 +55,6 @@ Test-URLs($urlsToCheck)
 Test-Winget
 
 # Install Software
-$inputVar = Read-Host "[DEBUG] Do you want to update software? (Y/N)"
-if($inputVar.ToUpper() -eq 'Y'){
-    Update-Software
-}
-
 Install-PowerShellLatest
 Install-WingetSoftware -softwareList $wingetSoftware
 Install-PIPSoftware -pipPackages $pipPackages
@@ -80,15 +80,13 @@ Initialize-Explorer -registrySettings $registrySettings
 Initialize-DesktopBackground -wallpaperPath $wallpaperPath
 Initialize-Waterfox -sourcePath $waterFoxConfigPath
 Initialize-WaterfoxPrefs -Preferences $waterFoxPrefrences
+
+# Updates
+Update-Software
 Get-WindowsUpdates
 
 # download VS code add custom theme
 
-# tweak the OS to not be annoying
-
-# improve this to not have so much embedded in one script possibly make desktop backgrouind a file
-# install everything blah maybe make it so it just installs software from an array using winget
 # potentially add a ui
-
 # check if windows needs updating
 # check if there are any driver updates

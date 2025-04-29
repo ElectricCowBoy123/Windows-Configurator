@@ -85,7 +85,8 @@ $wingetSoftware = @(
     @{ Name = "Visual Studio Code"; Id = "Microsoft.VisualStudioCode" },
     @{ Name = "OhMyPosh"; Id = "JanDeDobbeleer.OhMyPosh" },
     @{ Name = "Waterfox"; Id = "Waterfox.Waterfox" },
-    @{ Name = "Git"; Id = "Git.Git" }
+    @{ Name = "Git"; Id = "Git.Git" },
+    @{ Name = "Windows Neofetch"; Id = "nepnep.neofetch-win" }
 )
 
 $pipPackages = @(
