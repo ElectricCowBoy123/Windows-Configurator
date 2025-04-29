@@ -105,8 +105,5 @@ Update-Software
 Get-WindowsUpdates
 
 # download VS code add custom theme
-
 # potentially add a ui
-# check if windows needs updating
-# check if there are any driver updates
 # parameterise someway to run selectively
