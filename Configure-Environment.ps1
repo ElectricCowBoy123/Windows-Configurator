@@ -88,6 +88,7 @@ Initialize-Terminal
 Initialize-PS7Terminal
 Initialize-PowerShell
 Initialize-OhMyPosh -ohMyPoshThemeURL $ohMyPoshThemeURL
+Initialize-PSReadLine
 
 # Configure Notepad++
 Initialize-NotepadPlusPlus -ThemeFilePath $themeFilePath -ConfigFilePath $ConfigFilePath

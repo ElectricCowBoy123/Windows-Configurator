@@ -37,6 +37,20 @@ function Initialize-OhMyPosh(){
     }
 }
 
+function Initialize-PSReadLine(){
+    Write-Host "Configuring PSReadLine..." -ForegroundColor Cyan
+    [String]$profileContent = Get-Content $PROFILE -ErrorAction SilentlyContinue
+    if (-not ($profileContent -like "*Set-PSReadLineOption -PredictionSource History*") -and -not ($profileContent -like "*Set-PSReadLineOption -PredictionViewStyle ListView*") -and -not ($profileContent -like "*Set-PSReadLineOption -EditMode Windows*")) {
+        Add-Content -Path $PROFILE -Value "Set-PSReadLineOption -PredictionSource History"
+        Add-Content -Path $PROFILE -Value "Set-PSReadLineOption -PredictionViewStyle ListView"
+        Add-Content -Path $PROFILE -Value "Set-PSReadLineOption -EditMode Windows"
+        Write-Host "Configured PSReadLine." -ForegroundColor Yellow
+    }
+    else {
+        Write-Host "PSReadLine Configuration Already Added to Profile" -ForegroundColor Green
+    }
+}
+
 function Initialize-NotepadPlusPlus(){
     param (
         [Parameter(Mandatory=$True)]

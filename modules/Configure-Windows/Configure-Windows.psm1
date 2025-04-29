@@ -145,7 +145,7 @@ function Get-WindowsUpdates() {
             try {
                 if($updates.Length -gt 0){
                     Write-Host "Attempting to Install Windows Updates" -ForegroundColor Yellow
-                    $updates = Install-WindowsUpdate -AcceptAll -IgnoreReboot > $null 2>&1
+                    $updates = Install-WindowsUpdate -AcceptAll -IgnoreReboot *> $null
                 }
             }
             catch {
