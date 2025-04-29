@@ -145,7 +145,7 @@ function Get-WindowsUpdates() {
             try {
                 if($updates.Length -gt 0){
                     Write-Host "Attempting to Install Windows Updates" -ForegroundColor Yellow
-                    $null = Install-WindowsUpdate -AcceptAll -IgnoreReboot
+                    Start-Process powershell.exe -ArgumentList "-Command `"Install-WindowsUpdate -AcceptAll -IgnoreReboot`""
                 }
             }
             catch {

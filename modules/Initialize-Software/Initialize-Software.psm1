@@ -298,7 +298,7 @@ function Initialize-Waterfox(){
             
             foreach ($sourceFile in $sourceFiles) {
                 $relativePath = $sourceFile.FullName.Substring($sourcePath.Length + 1)
-                $chromeFilePath = Join-Path -Path $chromeFolderPath -ChildPath $relativePath
+                $chromeFilePath = Join-Path -Path $browserProfile.FullName -ChildPath $relativePath
                 #Write-Host "FilePath: $($chromeFilePath)"
                 if (-Not (Test-Path $chromeFilePath)) {
                     # If the file does not exist in chrome, we need to copy it
@@ -441,13 +441,14 @@ function Initialize-PS7Terminal(){
         return
     }
     $settingsContent = Get-Content -Path $settingsPath | ConvertFrom-Json
-    $PS7Profile = $settingsContent.profiles.list | Where-Object { $_.commandline -eq "$($env:SystemDrive)\\Program Files\\PowerShell\\7\\pwsh.exe" }
+    $PS7Profile = $settingsContent.profiles.list | Where-Object { $_.name -eq "PowerShell" }
     if ($PS7Profile) {
         $settingsContent.defaultProfile = $PS7Profile.guid
         $updatedSettings = $settingsContent | ConvertTo-Json -Depth 100
-        Set-Content -Path $settingsPath -Value $updatedSettings
+        $beautifiedJson = $updatedSettings | ConvertFrom-Json | ConvertTo-Json -Depth 100
+        Set-Content -Path $settingsPath -Value $beautifiedJson
         Write-Host "Default terminal profile updated to PowerShell 7." -ForegroundColor Yellow
     } else {
-        Write-Host "No PowerShell 7 profile found in Windows Terminal settings using the name attribute." -ForegroundColor Red
+        Write-Host "No PowerShell 7 profile found in Windows Terminal settings." -ForegroundColor Red
     }
 }
