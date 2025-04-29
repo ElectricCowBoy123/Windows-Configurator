@@ -50,8 +50,8 @@ Test-URLs($urlsToCheck)
 Test-Winget
 
 # Install Software
-$input = Read-Host "[DEBUG] Do you want to update software? (Y/N)"
-if($input.ToUpper() -eq 'Y'){
+$inputVar = Read-Host "[DEBUG] Do you want to update software? (Y/N)"
+if($inputVar.ToUpper() -eq 'Y'){
     Update-Software
 }
 
@@ -70,7 +70,7 @@ Install-ScheduledTasks -taskXml $taskXml -ahkDirectory $ahkDirectory
 # Configure Windows Terminal
 Initialize-Terminal
 Initialize-PowerShell
-Initialize-OhMyPosh
+Initialize-OhMyPosh -ohMyPoshThemeURL $ohMyPoshThemeURL
 
 # Configure Notepad++
 Initialize-NotepadPlusPlus -ThemeFilePath $themeFilePath -ConfigFilePath $ConfigFilePath
@@ -80,10 +80,10 @@ Initialize-Explorer -registrySettings $registrySettings
 Initialize-DesktopBackground -wallpaperPath $wallpaperPath
 Initialize-Waterfox -sourcePath $waterFoxConfigPath
 Initialize-WaterfoxPrefs -Preferences $waterFoxPrefrences
+Get-WindowsUpdates
 
 # download VS code add custom theme
 
-# download and configure waterfox add custom theme
 # tweak the OS to not be annoying
 
 # improve this to not have so much embedded in one script possibly make desktop backgrouind a file

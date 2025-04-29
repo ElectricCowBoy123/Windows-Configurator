@@ -78,29 +78,70 @@ function Initialize-Explorer() {
         $propertyValue = $setting.Value
         try {
             # Check if the registry key exists
-            if (Test-Path $registryPath) {
-                # Get the current value of the registry property
-                $currentValue = Get-ItemProperty -Path $registryPath -Name $propertyName -ErrorAction SilentlyContinue
+            if (-not (Test-Path $registryPath)) {
+                # Create the registry path if it doesn't exist
+                New-Item -Path $registryPath -Force | Out-Null
+                Write-Host "Created registry path '$registryPath'." -ForegroundColor Yellow
+            }
 
-                # Check if the current value is different from the desired value
-                if ($currentValue.$propertyName -ne $propertyValue) {
-                    # Set the registry property
-                    Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue -Type DWord -Force
-                    Write-Host "Successfully set '$propertyName' to '$propertyValue' for '$friendlyName'." -ForegroundColor Yellow
-                } else {
-                    if($propertyValue -eq 0){
-                        Write-Host "'$friendlyName' is already set to 'False' Skipping..." -ForegroundColor Green
-                    } elseif($propertyValue -eq 1){
-                        Write-Host "'$friendlyName' is already set to 'True' Skipping..." -ForegroundColor Green
-                    } else {
-                        Write-Host "'$friendlyName' is already set to '$($propertyValue)' Skipping..." -ForegroundColor Green
-                    }
-                }
+            # Get the current value of the registry property
+            $currentValue = Get-ItemProperty -Path $registryPath -Name $propertyName -ErrorAction SilentlyContinue
+
+            # Check if the current value is different from the desired value
+            if ($currentValue.$propertyName -ne $propertyValue) {
+                # Set the registry property
+                Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue -Type DWord -Force
+                Write-Host "Successfully set '$propertyName' to '$propertyValue' for '$friendlyName'." -ForegroundColor Yellow
             } else {
-                Write-Host "Registry path '$registryPath' does not exist. Skipping..." -ForegroundColor Red
+                if ($propertyValue -eq 0) {
+                    Write-Host "'$friendlyName' is already set to 'False'. Skipping..." -ForegroundColor Green
+                } elseif ($propertyValue -eq 1) {
+                    Write-Host "'$friendlyName' is already set to 'True'. Skipping..." -ForegroundColor Green
+                } else {
+                    Write-Host "'$friendlyName' is already set to '$($propertyValue)'. Skipping..." -ForegroundColor Green
+                }
             }
         } catch {
             Write-Host "Failed to set '$propertyName' for '$friendlyName'. Error: $_" -ForegroundColor Red
         }
+    }
+}
+
+function Get-WindowsUpdates() {
+    # Check if the PSWindowsUpdate module is available
+    if (-not (Get-Module -Name PSWindowsUpdate -ListAvailable)) {
+        Write-Host "PSWindowsUpdate module is not available. Installing it now..." -ForegroundColor Cyan
+        try {
+            Install-Module -Name PSWindowsUpdate -Force -Scope CurrentUser -ErrorAction Stop
+            Write-Host "PSWindowsUpdate module installed successfully." -ForegroundColor Green
+        } catch {
+            Write-Host "Failed to install PSWindowsUpdate module: $_" -ForegroundColor Red
+            return
+        }
+    }
+
+    # Import the PSWindowsUpdate module with error handling
+    try {
+        Import-Module PSWindowsUpdate -ErrorAction Stop
+        Write-Host "PSWindowsUpdate module imported successfully." -ForegroundColor Green
+    } catch {
+        Write-Host "Failed to import PSWindowsUpdate module: $_" -ForegroundColor Red
+        return
+    }
+
+    Write-Host "Checking for Windows updates..." -ForegroundColor Cyan
+
+    try {
+        # Get the list of available updates
+        $updates = Get-WindowsUpdate -AcceptAll -IgnoreReboot -ErrorAction Stop
+
+        if ($updates) {
+            Write-Host "The following updates are available:" -ForegroundColor Yellow
+            $updates | Format-Table -Property Title, Size, KBArticleID
+        } else {
+            Write-Host "No updates are available." -ForegroundColor Green
+        }
+    } catch {
+        Write-Host "An error occurred while checking for updates: $_" -ForegroundColor Red
     }
 }

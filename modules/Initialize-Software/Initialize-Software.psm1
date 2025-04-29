@@ -1,4 +1,8 @@
 function Initialize-OhMyPosh(){
+    Param(
+        [Parameter(Mandatory=$True)]
+        [string]$ohMyPoshThemeURL
+    )
     Write-Host "Configuring Oh My Posh..." -ForegroundColor Cyan
     # Add Oh My Posh to PATH if not already added
     $ohMyPoshPath = "$env:LOCALAPPDATA\Programs\oh-my-posh\bin"
@@ -16,13 +20,20 @@ function Initialize-OhMyPosh(){
     }
 
     # Add Oh My Posh initialization to the profile if not already present
-    $profileContent = Get-Content $PROFILE -ErrorAction SilentlyContinue
+    [String]$profileContent = Get-Content $PROFILE -ErrorAction SilentlyContinue
     # TODO make this paramterized, also make it so if the config is already there and the theme url gets changed then add it again, also consider downloading first offline might not work
-    if (-not ($profileContent -match "oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/cobalt2.omp.json' | Invoke-Expression")) {
+    if (-not ($profileContent -like "*oh-my-posh init pwsh --config*")) {
         Write-Host "Adding Oh My Posh initialization to PowerShell profile..." -ForegroundColor Yellow
-        Add-Content -Path $PROFILE -Value "oh-my-posh init pwsh --config 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/cobalt2.omp.json' | Invoke-Expression"
+        Add-Content -Path $PROFILE -Value "oh-my-posh init pwsh --config '$($ohMyPoshThemeURL)' | Invoke-Expression"
     } else {
-        Write-Host "Oh My Posh initialization is already present in the PowerShell profile, skipping..." -ForegroundColor Green
+        if(-not ($profileContent -like "*oh-my-posh init pwsh --config '$($ohMyPoshThemeURL)' | Invoke-Expression*")){
+          $newProfileContent = $profileContent -replace "oh-my-posh init pwsh --config '.*?'", "oh-my-posh init pwsh --config '$($ohMyPoshThemeURL)'"
+          Set-Content -Path $PROFILE -Value $newProfileContent
+          Write-Host "Updated Oh My Posh theme URL in PowerShell profile." -ForegroundColor Yellow
+        }
+        else {
+            Write-Host "Oh My Posh initialization is already present in the PowerShell profile, skipping..." -ForegroundColor Green
+        }
     }
 }
 
