@@ -235,6 +235,33 @@ function Install-Scrcpy(){
 }
 
 function Update-Software(){
+    function Test-Equivalency(){
+        param (
+            [Parameter(Mandatory = $true)]
+            [string]$string1,
+
+            [Parameter(Mandatory = $true)]
+            [string]$string2
+        )
+
+        # Split the strings into arrays of words
+        $words1 = $string1 -split '\s+'
+        $words2 = $string2 -split '\s+'
+
+        # Get the unique words from both strings
+        $uniqueWords1 = $words1 | Select-Object -Unique
+        $uniqueWords2 = $words2 | Select-Object -Unique
+
+        # Count the number of matching words
+        $matchingWordsCount = ($uniqueWords1 | Where-Object { $uniqueWords2 -contains $_ }).Count
+
+        # Calculate the percentage of matching words
+        $percentage = ($matchingWordsCount / $uniqueWords1.Count) * 100
+
+        # Return true if more than 50% of the words in string1 are in string2
+        return $percentage -gt 50
+    }
+
     Write-Host "Attempting to Update all Software Packages..." -ForegroundColor Cyan
 
     $wingetPackages = Get-WinGetPackage | Where-Object { $_.Source -eq "winget" }
@@ -250,14 +277,15 @@ function Update-Software(){
                         $processes = Get-Process -Name $wingetPackage.Name -ErrorAction SilentlyContinue
                         if ($processes) {
                             Write-Host "Attempting to Kill '$($wingetPackage.Name)'..." -ForegroundColor Yellow
-                            Start-Sleep -Seconds 2
+                            Start-Sleep -Seconds 2  
                             $processes | Stop-Process -Force -ErrorAction SilentlyContinue
                             $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
                         } else {
+                            Write-Host "DEBUG $($wingetPackage.Name)"
                             $processes = Get-Process | Select-Object Product, Id
                             if($processes){
                                 foreach($process in $processes){
-                                    if($process.Product -eq $wingetPackage.Name){
+                                    if($process.Product -eq $wingetPackage.Name -or $(Test-Equivalency -string1 $wingetPackage.Name -string2 $process.Product)){
                                         $process | Stop-Process -Force -ErrorAction SilentlyContinue
                                     }
                                 }

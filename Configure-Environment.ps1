@@ -53,11 +53,8 @@ function Import-Modules {
 Clear-Host
 
 # Reset Environment Vars (In-case any have been added)
-[System.Environment]::GetEnvironmentVariables() | ForEach-Object {
-    $name = $_.Key
-    $value = $_.Value
-    [System.Environment]::SetEnvironmentVariable($name, $value, [System.EnvironmentVariableTarget]::Process)
-}
+#$pathVariable = [System.Environment]::GetEnvironmentVariable("PATH")
+#[System.Environment]::SetEnvironmentVariable("PATH", $pathVariable, [System.EnvironmentVariableTarget]::Process)
 
 if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
     & neofetch

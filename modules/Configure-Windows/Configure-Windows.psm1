@@ -143,7 +143,7 @@ function Get-WindowsUpdates() {
 
         if ($updates) {
             Write-Host "The following updates are available:" -ForegroundColor Yellow
-            $updates | Format-Table -Property Title, Size, KBArticleID
+            $updates | Format-Table -Property Title, Size, KBArticleID | Out-String | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
         } else {
             Write-Host "No updates are available." -ForegroundColor Green
         }
