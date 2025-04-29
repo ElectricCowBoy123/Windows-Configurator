@@ -133,7 +133,7 @@ $registrySettings = @(
     @{ Name = "Show Hidden Files"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'Hidden'; Value = 1 },
     @{ Name = "Enable End Task"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarEndTask'; Value = 1 },
     @{ Name = "Disable Spotlight Suggestions"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'; Property = 'SubscribedContent-310093Enabled'; Value = 0 },
-    @{ Name = "Disable Spotlight Suggestions 2"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'; Property = 'SubscribedContent-338388Enabled'; Value = 0 }
+    @{ Name = "Disable Secondary Spotlight Suggestions"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'; Property = 'SubscribedContent-338388Enabled'; Value = 0 }
 )
 
 $waterFoxConfigPath = "$($PSScriptRoot)\config\Waterfox"

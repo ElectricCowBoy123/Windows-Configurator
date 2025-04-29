@@ -89,3 +89,6 @@ Initialize-WaterfoxPrefs -Preferences $waterFoxPrefrences
 # improve this to not have so much embedded in one script possibly make desktop backgrouind a file
 # install everything blah maybe make it so it just installs software from an array using winget
 # potentially add a ui
+
+# check if windows needs updating
+# check if there are any driver updates

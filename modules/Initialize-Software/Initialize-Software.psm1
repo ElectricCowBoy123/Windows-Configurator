@@ -257,7 +257,7 @@ function Initialize-Waterfox(){
             foreach ($sourceFile in $sourceFiles) {
                 $relativePath = $sourceFile.FullName.Substring($sourcePath.Length + 1)
                 $chromeFilePath = Join-Path -Path $chromeFolderPath -ChildPath $relativePath
-                Write-Host "FilePath: $($chromeFilePath)"
+                #Write-Host "FilePath: $($chromeFilePath)"
                 if (-Not (Test-Path $chromeFilePath)) {
                     # If the file does not exist in chrome, we need to copy it
                     $overwriteNeeded = $True

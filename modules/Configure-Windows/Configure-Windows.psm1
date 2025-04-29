@@ -19,7 +19,7 @@ function Initialize-DesktopBackground() {
 
     # Set wallpaper style to "Fit to screen"
     $regPath = "HKCU:\Control Panel\Desktop"
-    Set-ItemProperty -Path $regPath -Name WallpaperStyle -Value 6
+    Set-ItemProperty -Path $regPath -Name WallpaperStyle -Value 4
     Set-ItemProperty -Path $regPath -Name TileWallpaper -Value 0
 
     # Refresh the desktop to apply the changes
