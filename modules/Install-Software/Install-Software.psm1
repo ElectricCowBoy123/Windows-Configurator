@@ -92,7 +92,7 @@ function Install-pip() {
 function Install-ChromeDriver(){
     Write-Host "Installing ChromeDriver..." -ForegroundColor Cyan
     # Check and install ChromeDriver
-    $chromeDriverDir = "C:\ChromeDriver"
+    $chromeDriverDir = "$($env:systemDrive)\ChromeDriver"
 
     if (-not (Test-Path $chromeDriverDir)) {
         Write-Host "ChromeDriver directory does not exist. Creating directory..." -ForegroundColor Yellow
@@ -133,7 +133,7 @@ function Install-ChromeDriver(){
 function Install-AHK(){
     Write-Host "Installing AHK..." -ForegroundColor Cyan
     # Check and install AutoHotkey
-    $ahkExpectedPath = "C:\Program Files\AutoHotkey\v1.1.37.02\AutoHotkeyU64.exe"
+    $ahkExpectedPath = "$($env:systemDrive)\Program Files\AutoHotkey\v1.1.37.02\AutoHotkeyU64.exe"
     if (-not (Test-Path $ahkExpectedPath)) {
         Write-Host "AutoHotkey is not installed or the expected version is not found. Installing AutoHotkey v1.1.37.02..." -ForegroundColor Yellow
         $ahkInstallerUrl = "https://github.com/Lexikos/AutoHotkey_L/releases/download/v1.1.37.02/AutoHotkey_1.1.37.02_setup.exe"
@@ -184,7 +184,7 @@ function Install-Scrcpy(){
     # Download and install scrcpy
     $scrcpyUrl = "https://github.com/Genymobile/scrcpy/releases/download/v3.2/scrcpy-win64-v3.2.zip"
     $scrcpyZip = "scrcpy.zip"
-    $scrcpyDir = "C:\AHK\scrcpy"
+    $scrcpyDir = "$($env:systemDrive)\AHK\scrcpy"
 
     if (-not (Test-Path $scrcpyDir)) {
         Write-Host "scrcpy directory does not exist. Creating directory..." -ForegroundColor Yellow
@@ -236,5 +236,45 @@ function Install-Scrcpy(){
 
 function Update-Software(){
     Write-Host "Attempting to Update all Software Packages..." -ForegroundColor Cyan
-    Invoke-Expression "winget update --all --verbose"
+
+    $wingetPackages = Get-WinGetPackage | Where-Object { $_.Source -eq "winget" }
+
+    foreach($wingetPackage in $wingetPackages){
+        if($wingetPackage.Id -ne "Microsoft.Office"){
+            try {
+                Write-Host "Checking Package $($wingetPackage.Id)" -ForegroundColor Cyan
+                $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
+                if(-not ($output -like "*No available upgrade found*")){
+                    if($output -like '*Application is currently running*' -or $output -like '*Installer failed*'){
+                        Write-Host "Application is currently running, attempting to kill $($wingetPackage.Name)" -ForegroundColor Yellow
+                        $processes = Get-Process -Name $wingetPackage.Name -ErrorAction SilentlyContinue
+                        if ($processes) {
+                            Write-Host "Attempting to Kill '$($wingetPackage.Name)'..." -ForegroundColor Yellow
+                            Start-Sleep -Seconds 2
+                            $processes | Stop-Process -Force
+                            $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
+                        } else {
+                            Write-Host $output -ForegroundColor Red
+                            Write-Host "No running processes found for $($wingetPackage.Name)" -ForegroundColor Red
+                        }
+                    }
+                    elseif($output -like "*Successfully installed*"){
+                        Write-Host "Successfully Updated $($wingetPackage.Name)" -ForegroundColor Green
+                    }
+                    elseif($output -like "*The installer cannot be run from an administrator context*"){
+                        Write-Host "The installer cannot be run from an administrator context. Please update this under a non-admin context." -ForegroundColor Red
+                    }
+                    else {
+                        Write-Host "Encountered unhandled error while updating $($wingetPackage.Name): $output" -ForegroundColor Red
+                        exit(1)
+                    }
+                }
+            }
+            catch {
+                Write-Host "Error Updating $($wingetPackage.Name) $($_.Exception)" -ForegroundColor Red
+            }
+        }
+    }
 }
+
+

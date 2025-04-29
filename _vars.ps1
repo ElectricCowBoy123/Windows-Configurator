@@ -1,5 +1,5 @@
 $ahkDirectory = "$($PSScriptRoot)\config\AHK"
-$ahkExecutable = "C:\Program Files\AutoHotkey\v1.1.37.02\AutoHotkeyU64.exe"
+$ahkExecutable = "$($env:systemDrive)\Program Files\AutoHotkey\v1.1.37.02\AutoHotkeyU64.exe"
 $taskXml = @"
 <?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
@@ -125,7 +125,7 @@ $bloatwarePackages = @(
     "Microsoft.ZuneVideo"
 )
 
-$wallpaperPath = "C:\Users\JohnFearn\OneDrive - Daffodil Group\Pictures\Wallpapers\2ae89afb-f605-4679-80da-b47099b06d3e.png"
+$wallpaperPath = "$($env:systemDrive)\Users\JohnFearn\OneDrive - Daffodil Group\Pictures\Wallpapers\2ae89afb-f605-4679-80da-b47099b06d3e.png"
 
 $themeFilePath = "$($PSScriptRoot)\config\NotepadPlusPlus\VS2019-Dark.xml"
 $ConfigFilePath = "$($PSScriptRoot)\config\NotepadPlusPlus\config.xml"
@@ -133,12 +133,21 @@ $ConfigFilePath = "$($PSScriptRoot)\config\NotepadPlusPlus\config.xml"
 $registrySettings = @(
   @{ Name = "Show Hidden Files"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'Hidden'; Value = 1 },
   @{ Name = "Show File Extensions"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'HideFileExt'; Value = 0 },
-  @{ Name = "Enable End Task"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarEndTask'; Value = 1 },
+  @{ Name = "Enable Taskbar End Task"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarEndTask'; Value = 1 },
   @{ Name = "Disable Spotlight Suggestions"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'; Property = 'SubscribedContent-310093Enabled'; Value = 0 },
   @{ Name = "Disable Secondary Spotlight Suggestions"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager'; Property = 'SubscribedContent-338388Enabled'; Value = 0 },
-  @{ Name = "Disable Widgets"; Path = 'HKLM:\SOFTWARE\Policies\Microsoft\Dsh'; Property = 'AllowNewsAndInterests'; Value = 0 },
+  @{ Name = "Disable News and Interests"; Path = 'HKLM:\Software\Policies\Microsoft\Dsh'; Property = 'AllowNewsAndInterests'; Value = 0 },
   @{ Name = "Instant Context Menu"; Path = 'HKCU:\Control Panel\Desktop'; Property = 'MenuShowDelay'; Value = 0 },
-  @{ Name = "Disable Animations"; Path = 'HKCU:\Control Panel\Desktop\WindowMetrics'; Property = 'MinAnimate'; Value = 0 }
+  @{ Name = "Disable Animations"; Path = 'HKCU:\Control Panel\Desktop\WindowMetrics'; Property = 'MinAnimate'; Value = 0 },
+  @{ Name = "Enable Apps Darkmode"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize'; Property = 'AppsUseLightTheme'; Value = 0 },
+  @{ Name = "Enable Windows Darkmode"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize'; Property = 'SystemUsesLightTheme'; Value = 0 },
+  @{ Name = "Disable Windows Search"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Search'; Property = 'SearchboxTaskbarMode'; Value = 0 },
+  @{ Name = "Disable Sticky Keys"; Path = 'HKCU:\Control Panel\Accessibility\StickyKeys'; Property = 'Flags'; Value = 58 },
+  @{ Name = "Disable Taskbar Widgets"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarDa'; Value = 0 },
+  @{ Name = "Center the Taskbar"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarAl'; Value = 1 },
+  @{ Name = "Center the Taskbar"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarAl'; Value = 1 }
+  @{ Name = "Disable Start Menu Web Suggestions"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer'; Property = 'DisableSearchBoxSuggestions'; Value = 1 }
+  @{ Name = "Disable Taskbar Tasks Button"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'ShowTaskViewButton'; Value = 0 }
 )
 
 $waterFoxConfigPath = "$($PSScriptRoot)\config\Waterfox"

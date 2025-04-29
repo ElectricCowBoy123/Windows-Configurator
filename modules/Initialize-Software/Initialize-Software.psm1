@@ -103,6 +103,11 @@ function Initialize-PowerShell(){
 }
 
 function Initialize-Terminal(){
+    if (-not (Get-Command "wt" -ErrorAction SilentlyContinue)) {
+        Write-Host "Windows Terminal is not Installed!" -ForegroundColor Red
+        return
+    }
+
     Write-Host "Configuring Windows Terminal..." -ForegroundColor Cyan
     # Check and install MesloLGS font
     $mesloFontName = "MesloLGS"
@@ -195,7 +200,7 @@ function Install-ScheduledTasks() {
     }
 
     # Ensure the destination directory exists
-    $destinationDirectory = "C:\AHK"
+    $destinationDirectory = "$($env:systemDrive)\AHK"
     if (-not (Test-Path $destinationDirectory)) {
         New-Item -Path $destinationDirectory -ItemType Directory -Force | Out-Null
     }
@@ -381,3 +386,30 @@ function Initialize-WaterfoxPrefs {
     }
 }
 
+function Initialize-PS7Terminal(){
+    Write-Host "Configuring Windows Terminal to Use Powershell 7..." -ForegroundColor Cyan
+
+    if (-not (Test-Path -Path "$env:ProgramFiles\PowerShell\7")) {
+        Write-Host "Powershell 7 is not installed!" -ForegroundColor Red
+        return
+    }
+    if (-not (Get-Command "wt" -ErrorAction SilentlyContinue)) {
+        Write-Host "Windows Terminal not installed!" -ForegroundColor Red
+        return
+    }
+    $settingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
+    if (-not (Test-Path -Path $settingsPath)) {
+        Write-Host "Windows Terminal Settings file not found at $($settingsPath)" -ForegroundColor Red
+        return
+    }
+    $settingsContent = Get-Content -Path $settingsPath | ConvertFrom-Json
+    $PS7Profile = $settingsContent.profiles.list | Where-Object { $_.commandline -eq "$($env:SystemDrive)\\Program Files\\PowerShell\\7\\pwsh.exe" }
+    if ($PS7Profile) {
+        $settingsContent.defaultProfile = $PS7Profile.guid
+        $updatedSettings = $settingsContent | ConvertTo-Json -Depth 100
+        Set-Content -Path $settingsPath -Value $updatedSettings
+        Write-Host "Default terminal profile updated to PowerShell 7." -ForegroundColor Yellow
+    } else {
+        Write-Host "No PowerShell 7 profile found in Windows Terminal settings using the name attribute." -ForegroundColor Red
+    }
+}

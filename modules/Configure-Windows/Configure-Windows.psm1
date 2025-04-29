@@ -27,7 +27,7 @@ function Initialize-DesktopBackground() {
 }
 
 function Remove-Bloatware(){
-    Params(
+    Param(
         [Parameter(Mandatory = $True)]
         [array]$bloatwarePackages
     )
@@ -90,7 +90,13 @@ function Initialize-Explorer() {
             # Check if the current value is different from the desired value
             if ($currentValue.$propertyName -ne $propertyValue) {
                 # Set the registry property
-                Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue -Type DWord -Force
+                try {
+                    Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue -Type DWord -Force
+                }
+                catch {
+                    Write-Host "Failed to Set Registry Key $($registryPath) : $($PropertyName) Error: $($_.Exception)" -ForegroundColor Red
+                }
+                
                 Write-Host "Successfully set '$propertyName' to '$propertyValue' for '$friendlyName'." -ForegroundColor Yellow
             } else {
                 if ($propertyValue -eq 0) {
@@ -143,5 +149,16 @@ function Get-WindowsUpdates() {
         }
     } catch {
         Write-Host "An error occurred while checking for updates: $_" -ForegroundColor Red
+    }
+}
+
+function Invoke-DiskCleanup() {
+    Param(
+        [Parameter(Mandatory = $True)]
+        [bool]$runDism
+    )
+    Invoke-Expression "cleanmgr.exe /d $($env:systemDrive) /VERYLOWDISK"
+    if($runDism){
+        Invoke-Expression "Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase"
     }
 }

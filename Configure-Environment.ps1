@@ -41,6 +41,9 @@ function Import-Modules {
   Write-Host "Modules Imported Successfully." -ForegroundColor Green
 }
 
+# Clear Console
+Clear-Host
+
 if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
     & neofetch
     Write-Host ""
@@ -53,7 +56,7 @@ Test-Admin
 Set-ExecutionPolicies
 Test-URLs($urlsToCheck)
 Test-Winget
-
+<#
 # Install Software
 Install-PowerShellLatest
 Install-WingetSoftware -softwareList $wingetSoftware
@@ -69,6 +72,7 @@ Install-ScheduledTasks -taskXml $taskXml -ahkDirectory $ahkDirectory
 
 # Configure Windows Terminal
 Initialize-Terminal
+Initialize-PS7Terminal
 Initialize-PowerShell
 Initialize-OhMyPosh -ohMyPoshThemeURL $ohMyPoshThemeURL
 
@@ -80,7 +84,8 @@ Initialize-Explorer -registrySettings $registrySettings
 Initialize-DesktopBackground -wallpaperPath $wallpaperPath
 Initialize-Waterfox -sourcePath $waterFoxConfigPath
 Initialize-WaterfoxPrefs -Preferences $waterFoxPrefrences
-
+Invoke-DiskCleanup -runDism $False
+#>
 # Updates
 Update-Software
 Get-WindowsUpdates
@@ -90,3 +95,4 @@ Get-WindowsUpdates
 # potentially add a ui
 # check if windows needs updating
 # check if there are any driver updates
+# parameterise someway to run selectively
