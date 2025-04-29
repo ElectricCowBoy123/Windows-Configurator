@@ -38,7 +38,7 @@ function Install-PowerShellLatest {
 
 function Install-PIPSoftware() {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $True)]
         [array]$pipPackages
     )
     
@@ -237,16 +237,16 @@ function Install-Scrcpy(){
 function Update-Software(){
     function Test-Equivalency(){
         param (
-            [Parameter(Mandatory = $true)]
-            [string]$string1,
+            [Parameter(Mandatory = $True)]
+            [string]$firstString,
 
-            [Parameter(Mandatory = $true)]
-            [string]$string2
+            [Parameter(Mandatory = $True)]
+            [string]$secondString
         )
 
         # Split the strings into arrays of words
-        $words1 = $string1 -split '\s+'
-        $words2 = $string2 -split '\s+'
+        $words1 = $firstString -split '\s+'
+        $words2 = $secondString -split '\s+'
 
         # Get the unique words from both strings
         $uniqueWords1 = $words1 | Select-Object -Unique
@@ -280,14 +280,33 @@ function Update-Software(){
                             Start-Sleep -Seconds 2  
                             $processes | Stop-Process -Force -ErrorAction SilentlyContinue
                             $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
+                            if($output -notlike "*Successful*"){
+                                Write-Host "Unhandled Error Occured $($output)" -ForegroundColor Red
+                            }
+                            else {
+                                Write-Host "$($wingetPackage.Name) Updated Succcessfully." -ForegroundColor Green
+                            }
                         } else {
-                            Write-Host "DEBUG $($wingetPackage.Name)"
                             $processes = Get-Process | Select-Object Product, Id
                             if($processes){
+                                $processStopped = $False
                                 foreach($process in $processes){
-                                    if($process.Product -eq $wingetPackage.Name -or $(Test-Equivalency -string1 $wingetPackage.Name -string2 $process.Product)){
-                                        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+                                    if($($process.Product).Length -gt 0){
+                                        if($process.Product -eq $wingetPackage.Name -or $(Test-Equivalency -firstString $wingetPackage.Name -secondString $process.Product)){
+                                            $process | Stop-Process -Force -ErrorAction SilentlyContinue
+                                            $processStopped = $True
+                                        }
                                     }
+                                }
+                                if($processStopped){
+                                    $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
+                                    if($output -notlike "*Successful*"){
+                                        Write-Host "Unhandled Error Occured $($output)" -ForegroundColor Red
+                                    }
+                                    else {
+                                        Write-Host "$($wingetPackage.Name) Updated Succcessfully." -ForegroundColor Green
+                                    }
+                                    
                                 }
                             } else {
                                 Write-Host $output -ForegroundColor Red

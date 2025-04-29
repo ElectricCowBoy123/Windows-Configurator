@@ -69,7 +69,7 @@ Test-Admin
 Set-ExecutionPolicies
 Test-URLs($urlsToCheck)
 Test-Winget
-<#
+
 # Install Software
 Install-PowerShellLatest
 Install-WingetSoftware -softwareList $wingetSoftware
@@ -98,7 +98,7 @@ Initialize-DesktopBackground -wallpaperPath $wallpaperPath
 Initialize-Waterfox -sourcePath $waterFoxConfigPath
 Initialize-WaterfoxPrefs -Preferences $waterFoxPrefrences
 Invoke-DiskCleanup -runDism $False
-#>
+
 # Updates
 Update-Software
 Get-WindowsUpdates

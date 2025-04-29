@@ -1,6 +1,6 @@
 function Initialize-DesktopBackground() {
     param (
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $True)]
         [string]$wallpaperPath
     )
     Write-Host "Changing Desktop Wallpaper..." -ForegroundColor Cyan
@@ -42,13 +42,13 @@ function Remove-Bloatware(){
 
         if ($appxPackage) {
             Write-Host "Bloatware detected and removing: $package (AppxPackage)" -ForegroundColor Yellow
-            $bloatwareDetected = $true
+            $bloatwareDetected = $True
             $appxPackage | Remove-AppxPackage -AllUsers -ErrorAction Stop > $null 2>&1
         }
 
         if ($provisionedPackage) {
             Write-Host "Bloatware detected and removing: $package (ProvisionedPackage)" -ForegroundColor Yellow
-            $bloatwareDetected = $true
+            $bloatwareDetected = $True
             try {
                 Remove-AppxProvisionedPackage -Online -PackageName $provisionedPackage.PackageName -ErrorAction Stop > $null 2>&1
             } catch {
@@ -135,8 +135,6 @@ function Get-WindowsUpdates() {
         return
     }
 
-    Write-Host "Checking for Windows updates..." -ForegroundColor Cyan
-
     try {
         # Get the list of available updates
         $updates = Get-WindowsUpdate -AcceptAll -IgnoreReboot -ErrorAction Stop
@@ -144,12 +142,23 @@ function Get-WindowsUpdates() {
         if ($updates) {
             Write-Host "The following updates are available:" -ForegroundColor Yellow
             $updates | Format-Table -Property Title, Size, KBArticleID | Out-String | ForEach-Object { Write-Host $_ -ForegroundColor Yellow }
+            try {
+                if($updates.Length -gt 0){
+                    Write-Host "Attempting to Install Windows Updates" -ForegroundColor Yellow
+                    $updates = Install-WindowsUpdate -AcceptAll -IgnoreReboot > $null 2>&1
+                }
+            }
+            catch {
+                Write-Host "Failed to Install Windows Updates!" -ForegroundColor Red
+            }
         } else {
             Write-Host "No updates are available." -ForegroundColor Green
         }
     } catch {
         Write-Host "An error occurred while checking for updates: $_" -ForegroundColor Red
     }
+
+    
 }
 
 function Invoke-DiskCleanup() {

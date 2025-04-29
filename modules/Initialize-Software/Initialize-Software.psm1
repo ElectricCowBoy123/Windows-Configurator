@@ -104,8 +104,19 @@ function Initialize-PowerShell(){
 
 function Initialize-Terminal(){
     if (-not (Get-Command "wt" -ErrorAction SilentlyContinue)) {
-        Write-Host "Windows Terminal is not Installed!" -ForegroundColor Red
-        return
+        $windowsTerminalPath = "$($env:ProgramFiles)\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe"
+        if((Test-Path $windowsTerminalPath)){
+            $userPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
+            $machinePath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
+            if($userPath -notlike "*;$($windowsTerminalPath)*" -and $machinePath -notlike "*;$($windowsTerminalPath)*"){
+                Write-Host "Adding Windows Terminal to Path." -ForegroundColor Yellow
+                [Environment]::SetEnvironmentVariable("Path", $userPath + ";$($windowsTerminalPath)", [EnvironmentVariableTarget]::User)
+            }
+        }
+        else {
+            Write-Host "Windows Terminal is not Installed!" -ForegroundColor Red
+            return
+        }
     }
 
     Write-Host "Configuring Windows Terminal..." -ForegroundColor Cyan
@@ -171,7 +182,7 @@ function Initialize-Terminal(){
         $settingsJson.profiles.defaults.colorScheme = "Dark+"
 
         # Enable transparency at 90%
-        $settingsJson.profiles.defaults.useAcrylic = $true
+        $settingsJson.profiles.defaults.useAcrylic = $True
         $settingsJson.profiles.defaults.opacity = 90
 
         # Save the updated settings
@@ -184,10 +195,10 @@ function Initialize-Terminal(){
 
 function Install-ScheduledTasks() {
     param(
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $True)]
         [String]$ahkDirectory,
 
-        [Parameter(Mandatory = $true)]
+        [Parameter(Mandatory = $True)]
         [String]$taskXml
     )
     
@@ -366,8 +377,8 @@ function Initialize-WaterfoxPrefs {
                 # Replace the existing value
                 $prefsContent[$i] = $prefLine
                 Write-Host "Updated preference: $key to $value" -ForegroundColor Yellow
-                $changesMade = $true  # Mark that a change was made
-                $preferenceFound = $true
+                $changesMade = $True  # Mark that a change was made
+                $preferenceFound = $True
                 break  # Exit the loop since we found and updated the preference
             }
         }
@@ -376,7 +387,7 @@ function Initialize-WaterfoxPrefs {
         if (-not $preferenceFound) {
             $prefsContent += "`n$prefLine"
             Write-Host "Added preference: $key with value $value" -ForegroundColor Yellow
-            $changesMade = $true  # Mark that a change was made
+            $changesMade = $True  # Mark that a change was made
         }
     }
 
@@ -394,8 +405,14 @@ function Initialize-PS7Terminal(){
         return
     }
     if (-not (Get-Command "wt" -ErrorAction SilentlyContinue)) {
-        Write-Host "Windows Terminal not installed!" -ForegroundColor Red
-        return
+        if(-not (Test-Path "$($env:ProgramFiles)\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe")){
+            Write-Host "Adding Windows Terminal to Path." -ForegroundColor Yellow
+            [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$($env:ProgramFiles)\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe", [EnvironmentVariableTarget]::User)
+        }
+        else {
+            Write-Host "Windows Terminal is not Installed!" -ForegroundColor Red
+            return
+        }
     }
     $settingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
     if (-not (Test-Path -Path $settingsPath)) {
