@@ -251,22 +251,36 @@ function Update-Software(){
                         if ($processes) {
                             Write-Host "Attempting to Kill '$($wingetPackage.Name)'..." -ForegroundColor Yellow
                             Start-Sleep -Seconds 2
-                            $processes | Stop-Process -Force
+                            $processes | Stop-Process -Force -ErrorAction SilentlyContinue
                             $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
                         } else {
-                            Write-Host $output -ForegroundColor Red
-                            Write-Host "No running processes found for $($wingetPackage.Name)" -ForegroundColor Red
+                            $processes = Get-Process | Select-Object Product, Id
+                            if($processes){
+                                foreach($process in $processes){
+                                    if($process.Product -eq $wingetPackage.Name){
+                                        $process | Stop-Process -Force -ErrorAction SilentlyContinue
+                                    }
+                                }
+                            } else {
+                                Write-Host $output -ForegroundColor Red
+                                Write-Host "No running processes found for $($wingetPackage.Name)" -ForegroundColor Red
+                            }
                         }
                     }
                     elseif($output -like "*Successfully installed*"){
                         Write-Host "Successfully Updated $($wingetPackage.Name)" -ForegroundColor Green
                     }
                     elseif($output -like "*The installer cannot be run from an administrator context*"){
-                        Write-Host "The installer cannot be run from an administrator context. Please update this under a non-admin context." -ForegroundColor Red
+                        Write-Host "The installer for $($wingetPackage.Name) cannot be run from an administrator context. Please update this under a non-admin context." -ForegroundColor Red
+                    }
+                    elseif($output -like "*The package cannot be upgraded using winget*"){
+                        Write-Host "$($wingetPackage.Name) doesn't support being updated via Winget, boo!" -ForegroundColor Red
+                    }
+                    elseif($output -like "*This package's version number cannot be determined*"){
+                        Write-Host "$($wingetPackage.Name) version number cannot be determined" -ForegroundColor Red
                     }
                     else {
-                        Write-Host "Encountered unhandled error while updating $($wingetPackage.Name): $output" -ForegroundColor Red
-                        exit(1)
+                        Write-Host "Encountered unhandled error while updating $($wingetPackage.Name): `n ErrorText: `n $output" -ForegroundColor Red
                     }
                 }
             }

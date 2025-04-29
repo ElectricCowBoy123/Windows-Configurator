@@ -115,8 +115,9 @@ function Initialize-Explorer() {
 
 function Get-WindowsUpdates() {
     # Check if the PSWindowsUpdate module is available
+    Write-Host "Checking for Windows Updates..." -ForegroundColor Cyan
     if (-not (Get-Module -Name PSWindowsUpdate -ListAvailable)) {
-        Write-Host "PSWindowsUpdate module is not available. Installing it now..." -ForegroundColor Cyan
+        Write-Host "PSWindowsUpdate module is not available. Installing it now..." -ForegroundColor Yellow
         try {
             Install-Module -Name PSWindowsUpdate -Force -Scope CurrentUser -ErrorAction Stop
             Write-Host "PSWindowsUpdate module installed successfully." -ForegroundColor Green

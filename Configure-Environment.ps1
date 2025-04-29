@@ -7,42 +7,57 @@ try {
 
 # Need to change this function so modules aren't reimported if they are already loaded, this is a testing function
 function Import-Modules {
-  param(
-      [Parameter(Mandatory = $True)]
-      [array]$modules
-  )
-  
-  Write-Host "Importing Modules..." -ForegroundColor Cyan
-  
-  foreach ($module in $modules) {
-      if (Get-Module -Name $module.Name) {
-          Remove-Module -Name $module.Name -Force
-      }
+    param(
+        [Parameter(Mandatory = $True)]
+        [array]$modules
+    )
 
-      try {
-          # Check if the module file exists before attempting to import
-          if (Test-Path "$($module.Id)") {
-              Import-Module "$($module.Id)" -Force
-          } else {
-              Write-Host "Module file not found: $($module.Id)" -ForegroundColor Red
-              exit(1)
-          }
-      } catch {
-          Write-Host "Failed to Import $($module.Name). Error: $_" -ForegroundColor Red
-          exit(1)
-      }
+    Write-Host "Importing Modules..." -ForegroundColor Cyan
 
-      if (-not (Get-Module -Name $module.Name)) {
-          Write-Host "Failed to get module $($module.Name)" -ForegroundColor Red
-          exit(1)
-      }
-  }
-  
-  Write-Host "Modules Imported Successfully." -ForegroundColor Green
+    foreach ($module in $modules) {
+    $isPath = $True
+    if($module.Id -notlike '*/*' -and $module.Id -notlike '*\*'){
+        $isPath = $False
+        if($null -eq $(Get-Module $module.Name)){
+            Install-Module $module.Id -Force
+        }
+    }
+
+    if (Get-Module -Name $module.Name) {
+        Remove-Module -Name $module.Name -Force
+    }
+
+    try {
+        # Check if the module file exists before attempting to import
+        if ($(Test-Path "$($module.Id)") -or $null -eq $(Get-Module $module.Name)) {
+            Import-Module "$($module.Id)" -Force
+        } else {
+            Write-Host "Module file not found: $($module.Id)" -ForegroundColor Red
+            exit(1)
+        }
+    } catch {
+        Write-Host "Failed to Import $($module.Name). Error: $_" -ForegroundColor Red
+        exit(1)
+    }
+
+    if (-not (Get-Module -Name $module.Name)) {
+        Write-Host "Failed to get module $($module.Name)" -ForegroundColor Red
+        exit(1)
+    }
+    }
+
+    Write-Host "Modules Imported Successfully." -ForegroundColor Green
 }
 
 # Clear Console
 Clear-Host
+
+# Reset Environment Vars (In-case any have been added)
+[System.Environment]::GetEnvironmentVariables() | ForEach-Object {
+    $name = $_.Key
+    $value = $_.Value
+    [System.Environment]::SetEnvironmentVariable($name, $value, [System.EnvironmentVariableTarget]::Process)
+}
 
 if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
     & neofetch
@@ -50,6 +65,7 @@ if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
 }
 
 # Overhead
+Install-PackageProvider -Name NuGet -Force -Scope CurrentUser > $null # Dependency for Installing Microsoft.WinGet.Client
 Import-Modules -modules $modules
 Test-Windows11
 Test-Admin
