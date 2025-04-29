@@ -442,6 +442,11 @@ function Initialize-PS7Terminal(){
     }
     $settingsContent = Get-Content -Path $settingsPath | ConvertFrom-Json
     $PS7Profile = $settingsContent.profiles.list | Where-Object { $_.name -eq "PowerShell" }
+    if($settingsContent.defaultProfile -eq $PS7Profile.guid){
+        Write-Host "Default Terminal Profile Already Set to Powershell 7" -ForegroundColor Green
+        return
+    }
+
     if ($PS7Profile) {
         $settingsContent.defaultProfile = $PS7Profile.guid
         $updatedSettings = $settingsContent | ConvertTo-Json -Depth 100
