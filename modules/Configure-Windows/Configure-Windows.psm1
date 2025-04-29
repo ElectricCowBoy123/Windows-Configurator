@@ -129,7 +129,6 @@ function Get-WindowsUpdates() {
     # Import the PSWindowsUpdate module with error handling
     try {
         Import-Module PSWindowsUpdate -ErrorAction Stop
-        Write-Host "PSWindowsUpdate module imported successfully." -ForegroundColor Green
     } catch {
         Write-Host "Failed to import PSWindowsUpdate module: $_" -ForegroundColor Red
         return
