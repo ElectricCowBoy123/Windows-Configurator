@@ -125,6 +125,7 @@ function Initialize-Terminal(){
             if($userPath -notlike "*;$($windowsTerminalPath)*" -and $machinePath -notlike "*;$($windowsTerminalPath)*"){
                 Write-Host "Adding Windows Terminal to Path." -ForegroundColor Yellow
                 [Environment]::SetEnvironmentVariable("Path", $userPath + ";$($windowsTerminalPath)", [EnvironmentVariableTarget]::User)
+                [System.Environment]::SetEnvironmentVariable("Path", $userPath, [System.EnvironmentVariableTarget]::Process)    
             }
         }
         else {
@@ -419,9 +420,15 @@ function Initialize-PS7Terminal(){
         return
     }
     if (-not (Get-Command "wt" -ErrorAction SilentlyContinue)) {
-        if(-not (Test-Path "$($env:ProgramFiles)\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe")){
-            Write-Host "Adding Windows Terminal to Path." -ForegroundColor Yellow
-            [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$($env:ProgramFiles)\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe", [EnvironmentVariableTarget]::User)
+        $windowsTerminalPath = "$($env:ProgramFiles)\WindowsApps\Microsoft.WindowsTerminal_1.22.11141.0_x64__8wekyb3d8bbwe"
+        if((Test-Path $windowsTerminalPath)){
+            $userPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
+            $machinePath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
+            if($userPath -notlike "*;$($windowsTerminalPath)*" -and $machinePath -notlike "*;$($windowsTerminalPath)*"){
+                Write-Host "Adding Windows Terminal to Path." -ForegroundColor Yellow
+                [Environment]::SetEnvironmentVariable("Path", $userPath + ";$($windowsTerminalPath)", [EnvironmentVariableTarget]::User)
+                [System.Environment]::SetEnvironmentVariable("Path", $userPath, [System.EnvironmentVariableTarget]::Process)    
+            }
         }
         else {
             Write-Host "Windows Terminal is not Installed!" -ForegroundColor Red
