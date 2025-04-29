@@ -445,8 +445,7 @@ function Initialize-PS7Terminal(){
     if ($PS7Profile) {
         $settingsContent.defaultProfile = $PS7Profile.guid
         $updatedSettings = $settingsContent | ConvertTo-Json -Depth 100
-        $beautifiedJson = $updatedSettings | ConvertFrom-Json | ConvertTo-Json -Depth 100
-        Set-Content -Path $settingsPath -Value $beautifiedJson
+        Set-Content -Path $settingsPath -Value $updatedSettings
         Write-Host "Default terminal profile updated to PowerShell 7." -ForegroundColor Yellow
     } else {
         Write-Host "No PowerShell 7 profile found in Windows Terminal settings." -ForegroundColor Red
