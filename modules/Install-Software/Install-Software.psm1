@@ -280,7 +280,7 @@ function Update-Software(){
                             Start-Sleep -Seconds 2  
                             $processes | Stop-Process -Force -ErrorAction SilentlyContinue
                             $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
-                            if($output -notlike "*Successful*"){
+                            if($output -notlike "*Successfully installed*"){
                                 Write-Host "Unhandled Error Occured $($output)" -ForegroundColor Red
                             }
                             else {

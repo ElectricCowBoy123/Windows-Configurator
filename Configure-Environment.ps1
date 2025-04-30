@@ -108,3 +108,5 @@ Get-WindowsUpdates
 # download VS code add custom theme
 # potentially add a ui
 # parameterise someway to run selectively
+
+# should verify environment vars simple ones like C:\Windows\System32 should be added if not already

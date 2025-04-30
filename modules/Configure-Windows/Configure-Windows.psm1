@@ -19,11 +19,11 @@ function Initialize-DesktopBackground() {
 
     # Set wallpaper style to "Fit to screen"
     $regPath = "HKCU:\Control Panel\Desktop"
-    Set-ItemProperty -Path $regPath -Name WallpaperStyle -Value 4
+    Set-ItemProperty -Path $regPath -Name WallpaperStyle -Value 3
     Set-ItemProperty -Path $regPath -Name TileWallpaper -Value 0
 
     # Refresh the desktop to apply the changes
-    RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
+    & C:\Windows\System32\RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
 }
 
 function Remove-Bloatware(){
@@ -166,7 +166,7 @@ function Invoke-DiskCleanup() {
         [Parameter(Mandatory = $True)]
         [bool]$runDism
     )
-    Invoke-Expression "cleanmgr.exe /d $($env:systemDrive) /VERYLOWDISK"
+    Invoke-Expression "C:\Windows\System32\cleanmgr.exe /d $($env:systemDrive) /VERYLOWDISK"
     if($runDism){
         Invoke-Expression "Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase"
     }
