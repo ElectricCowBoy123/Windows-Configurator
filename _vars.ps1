@@ -96,6 +96,10 @@ $wingetSoftware = @(
     @{ Name = "WinDirStat"; Id = "WinDirStat.WinDirStat" }
 )
 
+$commonPaths = @(
+    @{ Name="System32"; Path = "$env:SystemRoot\System32"; Location = "Machine" } 
+)
+
 $pipPackages = @(
     @{ Name = "Selenium"; Module = "selenium" },
     @{ Name = "Requests"; Module = "requests" }

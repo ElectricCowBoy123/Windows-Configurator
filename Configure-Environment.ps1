@@ -50,10 +50,6 @@ function Import-Modules {
 # Clear Console
 Clear-Host
 
-# Reset Environment Vars (In-case any have been added)
-$pathVariable = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
-[System.Environment]::SetEnvironmentVariable("Path", $pathVariable, [System.EnvironmentVariableTarget]::Process)    
-
 if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
     & neofetch
     Write-Host ""
@@ -65,6 +61,13 @@ if(-not $nugetProvider){
     Install-PackageProvider -Name NuGet -Force -Scope CurrentUser > $null # Dependency for Installing Microsoft.WinGet.Client
 }
 Import-Modules -modules $modules
+
+Invoke-FixPathVar -paths $commonPaths
+
+# Reset Environment Vars (In-case any have been added)
+$pathVariable = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
+[System.Environment]::SetEnvironmentVariable("Path", $pathVariable, [System.EnvironmentVariableTarget]::Process)    
+
 Test-Windows11
 Test-Admin
 Set-ExecutionPolicies

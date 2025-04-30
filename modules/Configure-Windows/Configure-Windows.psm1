@@ -160,7 +160,6 @@ function Get-WindowsUpdates() {
 
     
 }
-
 function Invoke-DiskCleanup() {
     Param(
         [Parameter(Mandatory = $True)]
@@ -169,5 +168,31 @@ function Invoke-DiskCleanup() {
     Invoke-Expression "C:\Windows\System32\cleanmgr.exe /d $($env:systemDrive) /VERYLOWDISK"
     if($runDism){
         Invoke-Expression "Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase"
+    }
+}
+
+function Invoke-FixPathVar() {
+    Param(
+        [Parameter(Mandatory = $True)]
+        [array]$paths
+    )
+    Write-Host "Attempting to Fix Environment Variables..." -ForegroundColor Cyan
+
+    # Get the current Path variable
+    $currentPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::Machine)
+
+    # Loop through each common path
+    foreach ($item in $paths) {
+        # Get the current Path variable based on the specified location
+        $currentPath = [System.Environment]::GetEnvironmentVariable("Path", [System.EnvironmentVariableTarget]::$($item.Location))
+
+        # Check if the path is already in the Path variable
+        if (-not $currentPath -like "*$($item.Path)*") {
+            # If it doesn't exist, add it to the Path variable
+            [System.Environment]::SetEnvironmentVariable("Path", "$($currentPath);$($item.Path)", [System.EnvironmentVariableTarget]::$($item.Location))
+            Write-Host "Added to Path: $($item.Path)" -ForegroundColor Yellow
+        } else {
+            Write-Host "Path already exists: $($item.Path)" -ForegroundColor Green
+        }
     }
 }
