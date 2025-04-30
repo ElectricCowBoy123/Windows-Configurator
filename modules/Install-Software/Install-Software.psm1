@@ -280,7 +280,7 @@ function Update-Software(){
                             Start-Sleep -Seconds 2  
                             $processes | Stop-Process -Force -ErrorAction SilentlyContinue
                             $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"
-                            if($output -notlike "*Successfully installed*"){
+                            if($output -notlike "*Successfully installed*" -or $output -notlike "*Success*"){
                                 Write-Host "Unhandled Error Occured $($output)" -ForegroundColor Red
                             }
                             else {
@@ -314,7 +314,7 @@ function Update-Software(){
                             }
                         }
                     }
-                    elseif($output -like "*Successfully installed*"){
+                    elseif($output -like "*Successfully installed*" -or $output -like "*Success*"){
                         Write-Host "Successfully Updated $($wingetPackage.Name)" -ForegroundColor Green
                     }
                     elseif($output -like "*The installer cannot be run from an administrator context*"){
