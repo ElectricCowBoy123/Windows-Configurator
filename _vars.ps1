@@ -76,8 +76,10 @@ $modules = @(
     @{ Name = "Install-Software"; Id = "$PSScriptRoot\modules\Install-Software\Install-Software.psm1" },
     @{ Name = "Configure-Windows"; Id = "$PSScriptRoot\modules\Configure-Windows\Configure-Windows.psm1" },
     @{ Name = "Initialize-Software"; Id = "$PSScriptRoot\modules\Initialize-Software\Initialize-Software.psm1" },
-    @{ Name = "Microsoft.WinGet.Client"; Id = "Microsoft.WinGet.Client" },
-    @{ Name = "PSReadLine"; Id = "PSReadLine" }
+    @{ Name = "PSReadLine"; Id = "PSReadLine" },
+    @{ Name = "PowerShellGet"; Id = "PowerShellGet" },
+    @{ Name = "PackageManagement"; Id = "PackageManagement" },
+    @{ Name = "Microsoft.WinGet.Client"; Id = "Microsoft.WinGet.Client" }
 )
 
 $wingetSoftware = @(

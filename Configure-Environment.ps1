@@ -15,35 +15,33 @@ function Import-Modules {
     Write-Host "Importing Modules..." -ForegroundColor Cyan
 
     foreach ($module in $modules) {
-    $isPath = $True
-    if($module.Id -notlike '*/*' -and $module.Id -notlike '*\*'){
-        $isPath = $False
-        if($null -eq $(Get-Module $module.Name)){
-            Install-Module $module.Id -Force
+        if($module.Id -notlike '*/*' -and $module.Id -notlike '*\*'){
+            if($null -eq $(Get-Module $module.Name)){
+                Install-Module $module.Id -Force
+            }
         }
-    }
 
-    if (Get-Module -Name $module.Name) {
-        Remove-Module -Name $module.Name -Force
-    }
+        if (Get-Module -Name $module.Name) {
+            Remove-Module -Name $module.Name -Force
+        }
 
-    try {
-        # Check if the module file exists before attempting to import
-        if ($(Test-Path "$($module.Id)") -or $null -eq $(Get-Module $module.Name)) {
-            Import-Module "$($module.Id)" -Force
-        } else {
-            Write-Host "Module file not found: $($module.Id)" -ForegroundColor Red
+        try {
+            # Check if the module file exists before attempting to import
+            if ($(Test-Path "$($module.Id)") -or $null -eq $(Get-Module $module.Name)) {
+                Import-Module "$($module.Id)" -Force
+            } else {
+                Write-Host "Module file not found: $($module.Id)" -ForegroundColor Red
+                exit(1)
+            }
+        } catch {
+            Write-Host "Failed to Import $($module.Name). Error: $_" -ForegroundColor Red
             exit(1)
         }
-    } catch {
-        Write-Host "Failed to Import $($module.Name). Error: $_" -ForegroundColor Red
-        exit(1)
-    }
 
-    if (-not (Get-Module -Name $module.Name)) {
-        Write-Host "Failed to get module $($module.Name)" -ForegroundColor Red
-        exit(1)
-    }
+        if (-not (Get-Module -Name $module.Name)) {
+            Write-Host "Failed to get module $($module.Name)" -ForegroundColor Red
+            exit(1)
+        }
     }
 
     Write-Host "Modules Imported Successfully." -ForegroundColor Green
@@ -62,7 +60,10 @@ if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
 }
 
 # Overhead
-Install-PackageProvider -Name NuGet -Force -Scope CurrentUser > $null # Dependency for Installing Microsoft.WinGet.Client
+$nugetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+if(-not $nugetProvider){
+    Install-PackageProvider -Name NuGet -Force -Scope CurrentUser > $null # Dependency for Installing Microsoft.WinGet.Client
+}
 Import-Modules -modules $modules
 Test-Windows11
 Test-Admin
