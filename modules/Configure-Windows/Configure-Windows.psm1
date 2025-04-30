@@ -88,17 +88,24 @@ function Initialize-Explorer() {
             $currentValue = Get-ItemProperty -Path $registryPath -Name $propertyName -ErrorAction SilentlyContinue
 
             # Check if the current value is different from the desired value
-            if ($currentValue.$propertyName -ne $propertyValue) {
+            if ($currentValue.$propertyName -ne $propertyValue -and $null -ne $currentValue.$propertyName) {
                 # Set the registry property
                 try {
                     Set-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue -Type DWord -Force
-                }
-                catch {
+                } catch {
                     Write-Host "Failed to Set Registry Key $($registryPath) : $($PropertyName) Error: $($_.Exception)" -ForegroundColor Red
                 }
                 
                 Write-Host "Successfully set '$propertyName' to '$propertyValue' for '$friendlyName'." -ForegroundColor Yellow
-            } else {
+            } 
+            if($null -eq $currentValue){
+                try {
+                    New-ItemProperty -Path $registryPath -Name $propertyName -Value $propertyValue -Type DWord -Force
+                } catch {
+                    Write-Host "Failed to Create Registry Key $($registryPath) : $($PropertyName) Error: $($_.Exception)" -ForegroundColor Red
+                }
+            }
+            else {
                 if ($propertyValue -eq 0) {
                     Write-Host "'$friendlyName' is already set to 'False'. Skipping..." -ForegroundColor Green
                 } elseif ($propertyValue -eq 1) {
