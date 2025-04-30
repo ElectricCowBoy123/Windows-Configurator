@@ -23,7 +23,7 @@ function Initialize-DesktopBackground() {
     Set-ItemProperty -Path $regPath -Name TileWallpaper -Value 0
 
     # Refresh the desktop to apply the changes
-    & C:\Windows\System32\RUNDLL32.EXE user32.dll,UpdatePerUserSystemParameters
+    & "$env:SystemRoot\System32\RUNDLL32.EXE" user32.dll,UpdatePerUserSystemParameters
 }
 
 function Remove-Bloatware(){
@@ -165,7 +165,7 @@ function Invoke-DiskCleanup() {
         [Parameter(Mandatory = $True)]
         [bool]$runDism
     )
-    Invoke-Expression "C:\Windows\System32\cleanmgr.exe /d $($env:systemDrive) /VERYLOWDISK"
+    Invoke-Expression "$($env:SystemRoot)\cleanmgr.exe /d $($env:systemDrive) /VERYLOWDISK"
     if($runDism){
         Invoke-Expression "Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase"
     }

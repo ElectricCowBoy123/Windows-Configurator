@@ -249,7 +249,7 @@ function Install-ScheduledTasks() {
         $currentTaskXml = $currentTaskXml -replace 'FILEPATH', "$destinationDirectory\$($file.Name)"
 
         # Check if the task already exists
-        $taskExists = -not (schtasks.exe /Query /TN $taskPath 2>&1 | Select-String "ERROR:")
+        $taskExists = -not (& "$env:SystemRoot\schtasks.exe" /Query /TN $taskPath 2>&1 | Select-String "ERROR:")
 
         if (-not $taskExists) {
             # Save the XML to a temporary file
@@ -257,7 +257,7 @@ function Install-ScheduledTasks() {
             Set-Content -Path $tempXmlPath -Value $currentTaskXml -Encoding Unicode
 
             # Register the scheduled task
-            schtasks.exe /Create /TN $taskPath /XML $tempXmlPath /F | Out-Null
+            & "$env:SystemRoot\schtasks.exe" /Create /TN $taskPath /XML $tempXmlPath /F | Out-Null
 
             # Remove the temporary XML file
             Remove-Item -Path $tempXmlPath -Force
