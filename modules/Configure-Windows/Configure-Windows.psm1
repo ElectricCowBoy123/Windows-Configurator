@@ -165,7 +165,7 @@ function Invoke-DiskCleanup() {
         [Parameter(Mandatory = $True)]
         [bool]$runDism
     )
-    Invoke-Expression "$($env:SystemRoot)\cleanmgr.exe /d $($env:systemDrive) /VERYLOWDISK"
+    & "$($env:SystemRoot)\System32\cleanmgr.exe" /d "$($env:SystemDrive)" /VERYLOWDISK
     if($runDism){
         Invoke-Expression "Dism.exe /online /Cleanup-Image /StartComponentCleanup /ResetBase"
     }
@@ -190,9 +190,9 @@ function Invoke-FixPathVar() {
         if (-not $currentPath -like "*$($item.Path)*") {
             # If it doesn't exist, add it to the Path variable
             [System.Environment]::SetEnvironmentVariable("Path", "$($currentPath);$($item.Path)", [System.EnvironmentVariableTarget]::$($item.Location))
-            Write-Host "Added to Path: $($item.Path)" -ForegroundColor Yellow
+            Write-Host "Added to Path: $($item.Path) in $($item.Location) Path Var" -ForegroundColor Yellow
         } else {
-            Write-Host "Path already exists: $($item.Path)" -ForegroundColor Green
+            Write-Host "Path already exists: $($item.Path) in $($item.Location) Path Var" -ForegroundColor Green
         }
     }
 }

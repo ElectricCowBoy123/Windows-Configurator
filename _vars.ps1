@@ -97,7 +97,8 @@ $wingetSoftware = @(
 )
 
 $commonPaths = @(
-    @{ Name="System32"; Path = "$env:SystemRoot\System32"; Location = "Machine" } 
+    @{ Name="System32"; Path = "$env:SystemRoot\System32"; Location = "Machine" },
+    @{ Name="System32"; Path = "$env:SystemRoot\System32"; Location = "User" } 
 )
 
 $pipPackages = @(
