@@ -115,16 +115,16 @@ function Install-ChromeDriver(){
 
     # Add ChromeDriver to PATH for Machine scope if not already added
     if (-not ([Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) -split ";").Contains($chromeDriverDir)) {
-        Write-Host "Adding ChromeDriver to Machine PATH..." -ForegroundColor Yellow
         [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) + ";$chromeDriverDir", [EnvironmentVariableTarget]::Machine)
+        Write-Host "Added ChromeDriver to Machine PATH..." -ForegroundColor Yellow
     } else {
         Write-Host "ChromeDriver is already in Machine PATH, skipping..." -ForegroundColor Green
     }
 
     # Add ChromeDriver to PATH for User scope if not already added
     if (-not ([Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) -split ";").Contains($chromeDriverDir)) {
-        Write-Host "Adding ChromeDriver to User PATH..." -ForegroundColor Yellow
         [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$chromeDriverDir", [EnvironmentVariableTarget]::User)
+        Write-Host "Added ChromeDriver to User PATH..." -ForegroundColor Yellow
     } else {
         Write-Host "ChromeDriver is already in User PATH, skipping..." -ForegroundColor Green
     }
@@ -215,8 +215,8 @@ function Install-Scrcpy(){
 
     # Add scrcpy to PATH for Machine scope if not already added
     if (-not ($machinePath -split ";").Contains($scrcpyDir)) {
-        Write-Host "Adding scrcpy to Machine PATH..." -ForegroundColor Yellow
         [Environment]::SetEnvironmentVariable("Path", "$updatedMachinePath;$scrcpyDir", [EnvironmentVariableTarget]::Machine)
+        Write-Host "Adding scrcpy to Machine PATH..." -ForegroundColor Yellow
     } else {
         Write-Host "scrcpy is already in Machine PATH, skipping..." -ForegroundColor Green
     }
@@ -227,8 +227,8 @@ function Install-Scrcpy(){
 
     # Add scrcpy to PATH for User scope if not already added
     if (-not ($userPath -split ";").Contains($scrcpyDir)) {
-        Write-Host "Adding scrcpy to User PATH..." -ForegroundColor Yellow
         [Environment]::SetEnvironmentVariable("Path", "$updatedUserPath;$scrcpyDir", [EnvironmentVariableTarget]::User)
+        Write-Host "Adding scrcpy to User PATH..." -ForegroundColor Yellow
     } else {
         Write-Host "scrcpy is already in User PATH, skipping..." -ForegroundColor Green
     }

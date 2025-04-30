@@ -50,8 +50,8 @@ function Import-Modules {
 # Clear Console
 Clear-Host
 
-if(Get-Command "neofetch" -ErrorAction SilentlyContinue) {
-    & neofetch
+if(Get-Command "$($env:SystemRoot)\System32\neofetch" -ErrorAction SilentlyContinue) {
+    & "$($env:SystemRoot)\System32\neofetch"
     Write-Host ""
 }
 

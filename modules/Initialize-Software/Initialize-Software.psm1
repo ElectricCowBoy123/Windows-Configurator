@@ -7,8 +7,8 @@ function Initialize-OhMyPosh(){
     # Add Oh My Posh to PATH if not already added
     $ohMyPoshPath = "$env:LOCALAPPDATA\Programs\oh-my-posh\bin"
     if (-not ([Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) -split ";").Contains($ohMyPoshPath)) {
-        Write-Host "Adding Oh My Posh to PATH..." -ForegroundColor Yellow
         [Environment]::SetEnvironmentVariable("Path", [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User) + ";$ohMyPoshPath", [EnvironmentVariableTarget]::User)
+        Write-Host "Added Oh My Posh to PATH..." -ForegroundColor Yellow
     } else {
         Write-Host "Oh My Posh is already in PATH, skipping..." -ForegroundColor Green
     }
@@ -123,9 +123,9 @@ function Initialize-Terminal(){
             $userPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
             $machinePath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
             if($userPath -notlike "*;$($windowsTerminalPath)*" -and $machinePath -notlike "*;$($windowsTerminalPath)*"){
-                Write-Host "Adding Windows Terminal to Path." -ForegroundColor Yellow
                 [Environment]::SetEnvironmentVariable("Path", $userPath + ";$($windowsTerminalPath)", [EnvironmentVariableTarget]::User)
                 [System.Environment]::SetEnvironmentVariable("Path", $userPath, [System.EnvironmentVariableTarget]::Process)    
+                Write-Host "Added Windows Terminal to Path." -ForegroundColor Yellow
             }
         }
         else {
@@ -425,9 +425,9 @@ function Initialize-PS7Terminal(){
             $userPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::User)
             $machinePath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
             if($userPath -notlike "*;$($windowsTerminalPath)*" -and $machinePath -notlike "*;$($windowsTerminalPath)*"){
-                Write-Host "Adding Windows Terminal to Path." -ForegroundColor Yellow
                 [Environment]::SetEnvironmentVariable("Path", $userPath + ";$($windowsTerminalPath)", [EnvironmentVariableTarget]::User)
-                [System.Environment]::SetEnvironmentVariable("Path", $userPath, [System.EnvironmentVariableTarget]::Process)    
+                [System.Environment]::SetEnvironmentVariable("Path", $userPath, [System.EnvironmentVariableTarget]::Process)   
+                Write-Host "Added Windows Terminal to Path." -ForegroundColor Yellow 
             }
         }
         else {
