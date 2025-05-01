@@ -93,25 +93,25 @@ function Install-ChromeDriver(){
     Write-Host "Installing ChromeDriver..." -ForegroundColor Cyan
     # Check and install ChromeDriver
     $chromeDriverDir = "$($env:systemDrive)\ChromeDriver"
+    $chromeDriverExe = Join-Path $chromeDriverDir "chromedriver.exe"
 
     if (-not (Test-Path $chromeDriverDir)) {
         Write-Host "ChromeDriver directory does not exist. Creating directory..." -ForegroundColor Yellow
         New-Item -ItemType Directory -Path $chromeDriverDir -Force
     }
-
-    $chromeDriverExe = Join-Path $chromeDriverDir "chromedriver.exe"
+    
     if (-not (Test-Path $chromeDriverExe)) {
         Write-Host "ChromeDriver is not installed. Installing ChromeDriver..." -ForegroundColor Yellow
-        $chromeDriverUrl = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
-        $chromeDriverVersion = Invoke-RestMethod -Uri $chromeDriverUrl
-        $chromeDriverZip = "chromedriver_win32.zip"
-        $chromeDriverDownloadUrl = "https://chromedriver.storage.googleapis.com/$($chromeDriverVersion)/$($chromeDriverZip)"
-        Invoke-WebRequest -Uri $chromeDriverDownloadUrl -OutFile $chromeDriverZip
-        Expand-Archive -Path $chromeDriverZip -DestinationPath $chromeDriverDir -Force
-        Remove-Item -Path $chromeDriverZip
+        $chromeVersion = Invoke-Expression "winget list Google.Chrome" | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' | ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
+        $chromeDriverZip = "chromedriver-win64.zip"
+        $chromeDriverDownloadUrl = "https://chromedriver.storage.googleapis.com/chrome-for-testing-public/$($chromeVersion)/win64/$($chromeDriverZip)"
+        $chromeDriverZipPath = Join-Path $chromeDriverDir $chromeDriverZip
+        Invoke-WebRequest -Uri $chromeDriverDownloadUrl -OutFile $chromeDriverZipPath
+        Expand-Archive -Path $chromeDriverZipPath -DestinationPath $chromeDriverDir -Force
+        Remove-Item -Path $chromeDriverZipPath
     } else {
         Write-Host "ChromeDriver is already installed, skipping..." -ForegroundColor Green
-    }
+    }    
 
     # Add ChromeDriver to PATH for Machine scope if not already added
     if (-not ([Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine) -split ";").Contains($chromeDriverDir)) {
