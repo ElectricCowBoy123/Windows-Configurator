@@ -103,12 +103,17 @@ function Install-ChromeDriver(){
     if (-not (Test-Path $chromeDriverExe)) {
         Write-Host "ChromeDriver is not installed. Installing ChromeDriver..." -ForegroundColor Yellow
         $chromeVersion = Invoke-Expression "winget list Google.Chrome" | Select-String -Pattern '(\d+\.\d+\.\d+\.\d+)' | ForEach-Object { $_.Matches[0].Groups[1].Value.Trim() }
-        $chromeDriverZip = "chrome-win64.zip"
-        $chromeDriverDownloadUrl = "https://storage.googleapis.com/chrome-for-testing-public/$($chromeVersion)/win64/$($chromeDriverZip)"
-        $chromeDriverZipPath = Join-Path $chromeDriverDir $chromeDriverZip
+        $chromeDriverZip = "chromedriver-win64"
+        $chromeDriverDownloadUrl = "https://storage.googleapis.com/chrome-for-testing-public/$($chromeVersion)/win64/$($chromeDriverZip).zip"
+        $chromeDriverZipPath = Join-Path $chromeDriverDir "$($chromeDriverZip).zip"
         Invoke-WebRequest -Uri $chromeDriverDownloadUrl -OutFile $chromeDriverZipPath
         Expand-Archive -Path $chromeDriverZipPath -DestinationPath $chromeDriverDir -Force
+        $extractedFolderPath = Join-Path $chromeDriverDir $chromeDriverZip
+        if (Test-Path $extractedFolderPath) {
+            Move-Item -Path (Join-Path $extractedFolderPath "*") -Destination $chromeDriverDir -Force
+        }
         Remove-Item -Path $chromeDriverZipPath
+        Remove-Item -Path $extractedFolderPath
     } else {
         Write-Host "ChromeDriver is already installed, skipping..." -ForegroundColor Green
     }    
