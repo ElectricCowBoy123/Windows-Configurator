@@ -162,7 +162,9 @@ $registrySettings = @(
   @{ Name = "Disable Start Menu Web Suggestions"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer'; Property = 'DisableSearchBoxSuggestions'; Value = 1 },
   @{ Name = "Disable Taskbar Tasks Button"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'ShowTaskViewButton'; Value = 0 },
   @{ Name = "Hide Desktop Icons"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'HideIcons'; Value = 1 },
-  @{ Name = "Taskbar End Task"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSetting'; Property = 'TaskbarEndTask'; Value = 1 }
+  @{ Name = "Taskbar End Task"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSetting'; Property = 'TaskbarEndTask'; Value = 1 },
+  @{ Name = "Remove Copilot Button"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'ShowCopilotButton'; Value = 0 }
+  
 )
 
 $waterFoxConfigPath = "$($PSScriptRoot)\config\Waterfox"
