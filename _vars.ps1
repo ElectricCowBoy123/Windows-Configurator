@@ -95,8 +95,7 @@ $wingetSoftware = @(
     @{ Name = "Windows Neofetch"; Id = "nepnep.neofetch-win" },
     @{ Name = "Everything"; Id = "voidtools.Everything" },
     @{ Name = "VLC"; Id = "VideoLAN.VLC" },
-    @{ Name = "WinDirStat"; Id = "WinDirStat.WinDirStat" },
-    @{ Name = "WSL"; Id = "Microsoft.WSL" }
+    @{ Name = "WinDirStat"; Id = "WinDirStat.WinDirStat" }
 )
 
 $commonPaths = @(

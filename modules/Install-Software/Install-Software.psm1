@@ -138,7 +138,7 @@ function Install-ChromeDriver(){
 function Install-AHK(){
     Write-Host "Installing AHK..." -ForegroundColor Cyan
     # Check and install AutoHotkey
-    $ahkExpectedPath = "$($env:systemDrive)\Program Files\AutoHotkey\v1.1.37.02\AutoHotkeyU64.exe"
+    $ahkExpectedPath = "$($env:systemDrive)\Program Files\AutoHotkey\"
     if (-not (Test-Path $ahkExpectedPath)) {
         Write-Host "AutoHotkey is not installed or the expected version is not found. Installing AutoHotkey v1.1.37.02..." -ForegroundColor Yellow
         $ahkInstallerUrl = "https://github.com/Lexikos/AutoHotkey_L/releases/download/v1.1.37.02/AutoHotkey_1.1.37.02_setup.exe"
@@ -147,7 +147,7 @@ function Install-AHK(){
         Start-Process -FilePath $ahkInstallerPath -ArgumentList "/S" -Wait
         Remove-Item -Path $ahkInstallerPath -Force
     } else {
-        Write-Host "AutoHotkey v1.1.37.02 is already installed, skipping..." -ForegroundColor Green
+        Write-Host "AutoHotkey is already installed, skipping..." -ForegroundColor Green
     }
 }
 
@@ -177,7 +177,7 @@ function Install-Debian(){
 function Install-WSL(){
     Write-Host "Installing WSL..." -ForegroundColor Cyan
     # Check and install WSL and Debian
-    if (-not (Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux).State -eq "Enabled") {
+    if ((Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux).State -ne "Enabled") {
         Write-Host "WSL is not installed. Installing WSL..." -ForegroundColor Yellow
         # Invoke-Expression "wsl --install"
         Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart

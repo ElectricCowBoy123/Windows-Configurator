@@ -136,19 +136,36 @@ function Initialize-Terminal(){
 
     Write-Host "Configuring Windows Terminal..." -ForegroundColor Cyan
     # Check and install MesloLGS font
-    $mesloFontName = "MesloLGS"
+    $mesloFontName = "MesloLGS NF Regular"
     $fontsFolder = "$env:SystemRoot\Fonts"
 
-    if (-not (Get-ChildItem -Path $fontsFolder -Filter "*.ttf" | Where-Object { $_.Name -like "*$mesloFontName*" })) {
+    if (-not (Test-Path -Path "$($fontsFolder)\$($mesloFontName).ttf")) {
         Write-Host "MesloLGS NF font is not installed. Installing MesloLGS NF font..." -ForegroundColor Yellow
-        $mesloFontUrl = "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
-        $mesloFontZip = "Meslo.zip"
-        $mesloFontExtractPath = "MesloFonts"
+        $mesloFontUrl = "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf"
+        $mesloFontExtractPath = "$($env:TEMP)\MesloFonts"
+        $fontFilePath = "$($mesloFontExtractPath)\$($mesloFontName).ttf"
 
-        Invoke-WebRequest -Uri $mesloFontUrl -OutFile $mesloFontZip
-        Expand-Archive -Path $mesloFontZip -DestinationPath $mesloFontExtractPath -Force
-        Copy-Item -Path "$mesloFontExtractPath\*.ttf" -Destination $fontsFolder -Force
-        Remove-Item -Path $mesloFontZip, $mesloFontExtractPath -Recurse -Force
+        Invoke-WebRequest -Uri $mesloFontUrl -OutFile $fontFilePath
+        
+        # Set up font installation via Windows Shell
+        $fonts = (New-Object -ComObject Shell.Application).Namespace(0x14)
+        
+        # Install the font only if it’s not already present
+        if (-not (Test-Path "$fontsFolder\$mesloFontName.ttf")) {
+            Write-Host "Installing font: $mesloFontName"
+            $fonts.CopyHere($fontFilePath)
+        } else {
+            Write-Host "Font '$mesloFontName' is already installed."
+        }
+
+        # Copy font to Windows Fonts folder
+        Copy-Item -Path $fontFilePath -Destination $fontsFolder -Force
+        Write-Host "Font installation completed."
+
+        #Expand-Archive -Path $mesloFontZip -DestinationPath $mesloFontExtractPath -Force
+        #Copy-Item -Path "$mesloFontExtractPath\*.ttf" -Destination $fontsFolder -Force
+        #Read-Host
+        #Remove-Item -Path $mesloFontZip, $mesloFontExtractPath -Recurse -Force
 
         Write-Host "MesloLGS NF font installed successfully." -ForegroundColor Green
     } else {
@@ -158,27 +175,24 @@ function Initialize-Terminal(){
     # Set MesloLGS NF font as the default in Windows Terminal settings
     $terminalSettingsPath = "$env:LOCALAPPDATA\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json"
 
-    if (Test-Path $terminalSettingsPath) {
+    if (Test-Path -Path $terminalSettingsPath) {
         $settingsJson = Get-Content -Path $terminalSettingsPath -Raw | ConvertFrom-Json
 
-        if ($settingsJson.profiles.defaults.font.PSObject.Properties.Match("face")) {
-            if ($settingsJson.profiles.defaults.font.face -ne "MesloLGS NF") {
-                Write-Host "Setting MesloLGS NF font as the default..." -ForegroundColor Yellow
-                $settingsJson.profiles.defaults.font.face = "MesloLGS NF"
-                $settingsJson | ConvertTo-Json -Depth 10 | Set-Content -Path $terminalSettingsPath -Force
-                Write-Host "MesloLGS NF font has been set as the default in Windows Terminal settings." -ForegroundColor Green
-            } else {
-                Write-Host "MesloLGS NF font is already set as the default, skipping..." -ForegroundColor Green
-            }
-        } else {
-            Write-Host "Adding font.face property to defaults and setting it to MesloLGS NF..." -ForegroundColor Yellow
+        if (-not ($settingsJson.profiles.defaults.font.face -eq "MesloLGS NF")) {
+            Write-Host "Setting MesloLGS NF font as the default..." -ForegroundColor Yellow
+            
             if (-not $settingsJson.profiles.defaults.font) {
                 $settingsJson.profiles.defaults | Add-Member -MemberType NoteProperty -Name font -Value @{ face = "MesloLGS NF" }
-            } else {
-                $settingsJson.profiles.defaults.font | Add-Member -MemberType NoteProperty -Name face -Value "MesloLGS NF"
             }
+
+            if ($settingsJson.profiles.defaults.font.face -ne "MesloLGS NF") {
+                $settingsJson.profiles.defaults.font.face = "MesloLGS NF"
+            }
+
             $settingsJson | ConvertTo-Json -Depth 10 | Set-Content -Path $terminalSettingsPath -Force
             Write-Host "MesloLGS NF font has been set as the default in Windows Terminal settings." -ForegroundColor Green
+        } else {
+            Write-Host "MesloLGS NF font is already set as the default, skipping..." -ForegroundColor Green
         }
     } else {
         Write-Host "Windows Terminal settings file not found. Please ensure Windows Terminal is installed." -ForegroundColor Red
