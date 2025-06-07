@@ -441,13 +441,13 @@ function Initialize-WaterfoxPrefs {
                 [String]$currentLine = $prefsContent[$i]
                 [String]$currentValue = ($currentLine -split ',')[1].Trim() -replace '\);', ''
 
-                Write-Host "CurrentValue: $($currentValue)"
-                Write-Host "CurrentLine: $($currentLine)"
+                #Write-Host "CurrentValue: $($currentValue)"
+                #Write-Host "CurrentLine: $($currentLine)"
 
-                Write-Host "PrefLine $($prefLine)"
-                Write-Host "Existing Line $($existingLine)"
-                Write-Host "Value: $($value)"
-                Write-Host "PrefsContent: $($prefsContent[$i])"
+                #Write-Host "PrefLine $($prefLine)"
+                #Write-Host "Existing Line $($existingLine)"
+                #Write-Host "Value: $($value)"
+                #Write-Host "PrefsContent: $($prefsContent[$i])"
                 #exit(0)
 
                 #Write-Host "Value $($value) Currentvalue $($currentValue)"
