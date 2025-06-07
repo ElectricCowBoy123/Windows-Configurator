@@ -221,7 +221,16 @@ function Test-Winget() {
             Write-Host "Failed to install winget!" -ForegroundColor Red
         }
     }
+    
     else {
         Write-Host "winget is already installed." -ForegroundColor Green
+        [System.Version]$wingetVersion = $(winget --version) | ForEach-Object { $_ -replace "v", "" }
+        if($wingetVersion -lt [System.Version]"1.6.2"){
+            Write-Host "Winget Needs to be Upgraded < 1.6.2, Upgrading..." -ForegroundColor Yellow
+            $installerUrl = "https://aka.ms/getwinget"
+            $installerPath = "$env:TEMP\Microsoft.DesktopAppInstaller_*.msixbundle"
+            Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+            Start-Process "msiexec.exe" -ArgumentList "/i `"$installerPath`" /quiet /norestart" -Wait
+        }
     }
 }

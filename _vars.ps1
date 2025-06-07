@@ -71,7 +71,7 @@ $urlsToCheck = @(
     "https://aka.ms/getwinget"
 )
 
-$modules = @(
+$ps_modules = @(
     @{ Name = "Helper"; Id = "$PSScriptRoot\modules\Helper\Helper.psm1" },
     @{ Name = "Install-Software"; Id = "$PSScriptRoot\modules\Install-Software\Install-Software.psm1" },
     @{ Name = "Configure-Windows"; Id = "$PSScriptRoot\modules\Configure-Windows\Configure-Windows.psm1" },
@@ -83,7 +83,7 @@ $modules = @(
 )
 
 $wingetSoftware = @(
-    @{ Name = "Notepad++"; Id = "Notepad\+\+\.Notepad\+\+" },
+    @{ Name = "Notepad++"; Id = "Notepad++.Notepad++" },
     @{ Name = "Google Chrome"; Id = "Google.Chrome" },
     @{ Name = "7-Zip"; Id = "7zip.7zip" }
     @{ Name = "Visual Studio Code"; Id = "Microsoft.VisualStudioCode" },
@@ -93,7 +93,8 @@ $wingetSoftware = @(
     @{ Name = "Windows Neofetch"; Id = "nepnep.neofetch-win" },
     @{ Name = "Everything"; Id = "voidtools.Everything" },
     @{ Name = "VLC"; Id = "VideoLAN.VLC" },
-    @{ Name = "WinDirStat"; Id = "WinDirStat.WinDirStat" }
+    @{ Name = "WinDirStat"; Id = "WinDirStat.WinDirStat" },
+    @{ Name = "WSL"; Id = "Microsoft.WSL" }
 )
 
 $commonPaths = @(

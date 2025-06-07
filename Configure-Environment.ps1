@@ -60,7 +60,7 @@ $nugetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
 if(-not $nugetProvider){
     Install-PackageProvider -Name NuGet -Force -Scope CurrentUser > $null # Dependency for Installing Microsoft.WinGet.Client
 }
-Import-Modules -modules $modules
+Import-Modules -modules $ps_modules
 
 Invoke-FixPathVar -paths $commonPaths
 

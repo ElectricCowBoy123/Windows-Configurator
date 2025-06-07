@@ -194,11 +194,24 @@ function Initialize-Terminal(){
         }
 
         # Set the color scheme to Dark+
-        $settingsJson.profiles.defaults.colorScheme = "Dark+"
-
+        try{
+             $settingsJson.profiles.defaults.colorScheme = "Dark+"
+        } catch [SetValueInvocationException] {
+            $settingsJson.profiles.defaults | Add-Member -MemberType NoteProperty -Name colorScheme -Value "Dark+"
+        }
+            
         # Enable transparency at 90%
-        $settingsJson.profiles.defaults.useAcrylic = $True
-        $settingsJson.profiles.defaults.opacity = 90
+        try{
+            $settingsJson.profiles.defaults.useAcrylic = $True
+        } catch [SetValueInvocationException] {
+            $settingsJson.profiles.defaults | Add-Member -MemberType NoteProperty -Name useAcrylic -Value $True
+        }
+
+        try{
+            $settingsJson.profiles.defaults.opacity = 90
+        } catch [SetValueInvocationException] {
+            $settingsJson.profiles.defaults | Add-Member -MemberType NoteProperty -Name opacity -Value 90
+        }
 
         # Save the updated settings
         $settingsJson | ConvertTo-Json -Depth 10 | Set-Content -Path $terminalSettingsPath -Force
