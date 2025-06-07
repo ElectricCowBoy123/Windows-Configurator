@@ -272,7 +272,7 @@ function Update-Software(){
     $wingetPackages = Get-WinGetPackage | Where-Object { $_.Source -eq "winget" }
 
     foreach($wingetPackage in $wingetPackages){
-        if($wingetPackage.Id -ne "Microsoft.Office"){
+        if($wingetPackage.Id -ne "Microsoft.Office" -and $wingetPackage.Id -ne "Microsoft.Edge"){
             try {
                 Write-Host "Checking Package $($wingetPackage.Id)" -ForegroundColor Cyan
                 $output = Invoke-Expression "winget update $($wingetPackage.Id) --verbose"

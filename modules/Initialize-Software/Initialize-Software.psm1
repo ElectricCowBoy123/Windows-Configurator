@@ -349,7 +349,7 @@ function Initialize-Waterfox(){
                     }
                 }
             }
-
+    
             if ($overwriteNeeded) {
                 # Ensure the chrome folder exists before copying
                 if (-Not (Test-Path $chromeFolderPath)) {
@@ -364,6 +364,38 @@ function Initialize-Waterfox(){
             }
         }
     }
+    
+    Write-Host "Configuring Waterfox Extensions..." -ForegroundColor Cyan
+    foreach ($browserProfile in $profileDirectories) {
+        $addonsJsonPath = Join-Path -Path $browserProfile.FullName -ChildPath "addons.json"
+        if (Test-Path $addonsJsonPath) {
+            $extensionsPath = Join-Path -Path $browserProfile.FullName -ChildPath "extensions"
+            $ublockFile = Join-Path -Path $extensionsPath -ChildPath "uBlock0@raymondhill.net.xpi"
+            if (-not (Test-Path $ublockFile)) {
+                Start-Process "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi"
+                Write-Host "Press <Enter> After Installing Extension" -ForegroundColor Yellow
+                Read-Host
+            } else {
+                Write-Host "uBlock Origin extension already present in profile '$($browserProfile.Name)'..." -ForegroundColor Green
+            }
+        }
+    } 
+    
+    foreach ($browserProfile in $profileDirectories) {
+        $addonsJsonPath = Join-Path -Path $browserProfile.FullName -ChildPath "addons.json"
+        if (Test-Path $addonsJsonPath) {
+            $extensionsPath = Join-Path -Path $browserProfile.FullName -ChildPath "extensions"
+            $darkreaderFile = Join-Path -Path $extensionsPath -ChildPath "addon@darkreader.org.xpi"
+            if (-not (Test-Path $darkreaderFile)) {
+                Start-Process "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi"
+                Write-Host "Press <Enter> After Installing Extension" -ForegroundColor Yellow
+                Read-Host
+            } else {
+                Write-Host "Dark Reader extension already present in profile '$($browserProfile.Name)'..." -ForegroundColor Green
+            }
+        }
+    }
+    # TODO make it so can install extensions from a dictionary in _vars.ps1
 }
 
 function Initialize-WaterfoxPrefs {
@@ -409,13 +441,13 @@ function Initialize-WaterfoxPrefs {
                 [String]$currentLine = $prefsContent[$i]
                 [String]$currentValue = ($currentLine -split ',')[1].Trim() -replace '\);', ''
 
-                #Write-Host "CurrentValue: $($currentValue)"
-                #Write-Host "CurrentLine: $($currentLine)"
+                Write-Host "CurrentValue: $($currentValue)"
+                Write-Host "CurrentLine: $($currentLine)"
 
-                #Write-Host "PrefLine $($prefLine)"
-                #Write-Host "Existing Line $($existingLine)"
-                #Write-Host "Value: $($value)"
-                #Write-Host "PrefsContent: $($prefsContent[$i])"
+                Write-Host "PrefLine $($prefLine)"
+                Write-Host "Existing Line $($existingLine)"
+                Write-Host "Value: $($value)"
+                Write-Host "PrefsContent: $($prefsContent[$i])"
                 #exit(0)
 
                 #Write-Host "Value $($value) Currentvalue $($currentValue)"
@@ -425,6 +457,20 @@ function Initialize-WaterfoxPrefs {
                     $preferenceFound = $True
                     break  # Skip to the next preference
                 } else {
+                    if(-not $runOnce){
+                        Write-Host "Stopping Waterfox Processes..." -ForegroundColor Cyan
+                        $waterfoxProcesses = Get-Process -Name "waterfox" -ErrorAction SilentlyContinue
+                        $stoppedAny = $false
+                        foreach ($proc in $waterfoxProcesses) {
+                            try {
+                                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                                $stoppedAny = $true
+                            } catch {
+                                Write-Host "Failed to stop Waterfox process (PID: $($proc.Id)): $_" -ForegroundColor Red
+                            }
+                        }
+                        $runOnce = $True
+                    }
                     # Replace the existing value
                     $prefsContent[$i] = $prefLine
                     Write-Host "Updated preference: $key to $value" -ForegroundColor Yellow
@@ -437,6 +483,20 @@ function Initialize-WaterfoxPrefs {
 
         # If the preference was not found, add it to the end of the file
         if (-not $preferenceFound) {
+            if(-not $runOnce){
+                Write-Host "Stopping Waterfox Processes..." -ForegroundColor Cyan
+                $waterfoxProcesses = Get-Process -Name "waterfox" -ErrorAction SilentlyContinue
+                $stoppedAny = $false
+                foreach ($proc in $waterfoxProcesses) {
+                    try {
+                        Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+                        $stoppedAny = $true
+                    } catch {
+                        Write-Host "Failed to stop Waterfox process (PID: $($proc.Id)): $_" -ForegroundColor Red
+                    }
+                }
+                $runOnce = $True
+            }
             $prefsContent += "`n$prefLine"
             Write-Host "Added preference: $key with value $value" -ForegroundColor Yellow
             $changesMade = $True  # Mark that a change was made
@@ -446,6 +506,17 @@ function Initialize-WaterfoxPrefs {
     # Write the updated content back to prefs.js only if changes were made
     if ($changesMade) {
         Set-Content -Path $prefsFilePath -Value $prefsContent
+    }
+
+    if ($stoppedAny) {
+        Start-Sleep -Seconds 2
+        $waterfoxExe = Get-ChildItem "$env:ProgramFiles\Waterfox" -Recurse -Filter "waterfox.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($waterfoxExe) {
+            Start-Process $waterfoxExe.FullName
+            Write-Host "Waterfox relaunched after stopping processes." -ForegroundColor Yellow
+        } else {
+            Write-Host "Could not find Waterfox executable to relaunch." -ForegroundColor Red
+        }
     }
 }
 

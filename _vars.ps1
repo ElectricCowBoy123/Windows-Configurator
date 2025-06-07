@@ -161,13 +161,15 @@ $registrySettings = @(
   @{ Name = "Center the Taskbar"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarAl'; Value = 1 },
   @{ Name = "Disable Start Menu Web Suggestions"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer'; Property = 'DisableSearchBoxSuggestions'; Value = 1 },
   @{ Name = "Disable Taskbar Tasks Button"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'ShowTaskViewButton'; Value = 0 },
-  @{ Name = "Hide Desktop Icons"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'HideIcons'; Value = 0 }
+  @{ Name = "Hide Desktop Icons"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'HideIcons'; Value = 1 },
+  @{ Name = "Taskbar End Task"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSetting'; Property = 'TaskbarEndTask'; Value = 1 }
 )
 
 $waterFoxConfigPath = "$($PSScriptRoot)\config\Waterfox"
 
 $waterFoxPrefrences = @{
   "browser.theme.enableWaterfoxCustomizations" = 2
+  "browser.urlbar.placeholderName" = '"Google"'
 }
 
 $ohMyPoshThemeURL = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/refs/heads/main/themes/cobalt2.omp.json"
