@@ -49,8 +49,9 @@ $taskXml = @"
 </Task>
 "@
 
-
-Add-Type -TypeDefinition @"
+if ([AppDomain]::CurrentDomain.GetAssemblies().GetTypes().Name -contains "Params") {
+} else {
+    Add-Type -TypeDefinition @"
 using System;
 using System.Runtime.InteropServices;
 
@@ -60,6 +61,7 @@ public class Params
     public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
 }
 "@
+}
 
 $urlsToCheck = @(
     "https://chromedriver.storage.googleapis.com/LATEST_RELEASE",

@@ -6,7 +6,7 @@ function Install-WingetSoftware() {
     Write-Host "Attempting to Install Software..." -ForegroundColor Cyan
     # Loop through the software list and install if not already installed
     foreach ($software in $softwareList) {
-        if (-not (winget list | Select-String $software.Id)) {
+        if (-not (winget list | Select-String -SimpleMatch $software.Id)) {
             Write-Host "$($software.Name) is not installed. Installing $($software.Name)..." -ForegroundColor Yellow
             Invoke-Expression "winget install --id $($software.Id) --source winget --disable-interactivity --verbose"
         } else {
@@ -179,8 +179,8 @@ function Install-WSL(){
     # Check and install WSL and Debian
     if (-not (Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux).State -eq "Enabled") {
         Write-Host "WSL is not installed. Installing WSL..." -ForegroundColor Yellow
-        Invoke-Expression "wsl --install"
-        Start-Sleep -Seconds 10
+        # Invoke-Expression "wsl --install"
+        Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Windows-Subsystem-Linux -NoRestart
     }
 }
 
