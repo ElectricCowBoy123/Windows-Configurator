@@ -1,2 +1,2 @@
 # Executing
-`irm "https://github.com/ElectricCowBoy123/Ninja-RMM-Scripts/raw/refs/heads/main/Utilities/Configure%20Development%20Environment.ps1" | iex`
+`irm "https://raw.githubusercontent.com/ElectricCowBoy123/Windows-Configurator/refs/heads/main/Configure-Environment.ps1?token=GHSAT0AAAAAADFIGVDN6GDSMZQJQ7TTRJHK2CEJ4HA" | iex`
