@@ -159,8 +159,9 @@ $registrySettings = @(
   @{ Name = "Disable Sticky Keys"; Path = 'HKCU:\Control Panel\Accessibility\StickyKeys'; Property = 'Flags'; Value = 58 },
   @{ Name = "Disable Taskbar Widgets"; Path = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarDa'; Value = 0 },
   @{ Name = "Center the Taskbar"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'TaskbarAl'; Value = 1 },
-  @{ Name = "Disable Start Menu Web Suggestions"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer'; Property = 'DisableSearchBoxSuggestions'; Value = 1 }
-  @{ Name = "Disable Taskbar Tasks Button"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'ShowTaskViewButton'; Value = 0 }
+  @{ Name = "Disable Start Menu Web Suggestions"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer'; Property = 'DisableSearchBoxSuggestions'; Value = 1 },
+  @{ Name = "Disable Taskbar Tasks Button"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced'; Property = 'ShowTaskViewButton'; Value = 0 },
+  @{ Name = "Hide Desktop Icons"; Path = 'HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced' Property = 'HideIcons'; Value = 0 }
 )
 
 $waterFoxConfigPath = "$($PSScriptRoot)\config\Waterfox"

@@ -203,3 +203,7 @@ function Invoke-FixPathVar() {
         }
     }
 }
+
+function Unpin-Taskbar(){
+    # unpin all apps from taskbar
+}
