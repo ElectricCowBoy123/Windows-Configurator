@@ -99,6 +99,7 @@ Initialize-NotepadPlusPlus -ThemeFilePath $themeFilePath -ConfigFilePath $Config
 
 # Configure Windows
 Initialize-Explorer -registrySettings $registrySettings
+Initialize-Taskbar
 Initialize-DesktopBackground -wallpaperPath $wallpaperPath
 Initialize-Waterfox -sourcePath $waterFoxConfigPath
 Initialize-WaterfoxPrefs -Preferences $waterFoxPrefrences

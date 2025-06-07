@@ -9,7 +9,7 @@
     Description = 'This module contains functions to configure Windows settings and remove bloatware.'
 
     # Functions to export
-    FunctionsToExport = @('Initialize-DesktopBackground', 'Remove-Bloatware', 'Initialize-Explorer', 'Get-WindowsUpdates', 'Invoke-DiskCleanup', 'Invoke-FixPathVar')
+    FunctionsToExport = @('Initialize-DesktopBackground', 'Remove-Bloatware', 'Initialize-Explorer', 'Get-WindowsUpdates', 'Invoke-DiskCleanup', 'Invoke-FixPathVar', 'Unpin-Taskbar')
 
     # Cmdlets to export
     CmdletsToExport = @()

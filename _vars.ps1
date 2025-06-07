@@ -139,7 +139,7 @@ $bloatwarePackages = @(
     "Microsoft.ZuneVideo"
 )
 
-$wallpaperPath = "$($env:systemDrive)\Users\JohnFearn\OneDrive - Daffodil Group\Pictures\Wallpapers\2ae89afb-f605-4679-80da-b47099b06d3e.png"
+$wallpaperPath = "$($env:USERPROFILE)\Pictures\wallpaper.png"
 
 $themeFilePath = "$($PSScriptRoot)\config\NotepadPlusPlus\VS2019-Dark.xml"
 $ConfigFilePath = "$($PSScriptRoot)\config\NotepadPlusPlus\config.xml"
